@@ -52,3 +52,39 @@ It also aims to provide evidence of student understanding through assessment res
 ### 💻 Coding Assessment
 - Support programming challenges.
 - Execute submitted code in a controlled
+
+## Voice Coding Mentor
+
+The coding workspace uses Monaco Editor diagnostics when available and can also
+accept output copied from an existing compiler or runner. It does not execute
+student code. No code runner or isolated execution service exists in this
+repository; use a separate sandboxed runner with time, memory, filesystem, and
+network restrictions before enabling code execution.
+
+### Setup
+
+1. Install Node.js 20.19+ and Python 3.10+.
+2. Install frontend packages with `npm install`, then start the portal with
+   `npm run dev`.
+3. Install backend packages with `python -m pip install -r backend/requirements.txt`.
+4. If `backend/.env` does not exist, copy `backend/.env.example` to create it.
+   Otherwise, preserve the existing file and add only the missing variable
+   names. Set `GEMINI_API_KEY` on the backend and `FRONTEND_ORIGINS` to the
+   exact frontend origin. The optional `GEMINI_MODEL` defaults to
+   `gemini-2.5-flash`.
+5. Start the API from the repository root with
+   `python -m uvicorn main:app --app-dir backend --reload`.
+6. Run the backend unit tests from the repository root with
+   `python -m unittest backend.test_mentor`.
+
+The frontend sends requests to `http://localhost:8000` by default. Set
+`VITE_API_BASE_URL` in a local frontend `.env.local` to change it. The backend
+limits request sizes, supports a fixed language list, and does not save mentor
+events or open a MongoDB connection. The existing MongoDB test script and
+portal page sources are retained unchanged.
+
+The hint endpoint is not connected to an authentication system because this
+repository contains none. Before public deployment, protect it with the
+portal's authentication and server-side rate limiting. CORS is not
+authentication. Student code and diagnostics are sent to Gemini when a hint is
+requested; review the provider's data handling requirements before use.

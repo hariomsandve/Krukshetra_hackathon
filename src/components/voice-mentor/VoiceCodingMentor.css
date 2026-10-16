@@ -1,0 +1,390 @@
+:root {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #e5e7eb;
+    background: #0b1220;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button,
+select,
+input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.mentor-app {
+    width: min(1440px, 100%);
+    min-height: 100vh;
+    margin: 0 auto;
+    padding: 32px clamp(16px, 4vw, 56px) 48px;
+}
+
+.mentor-header,
+.mentor-panel-heading,
+.editor-toolbar,
+.hint-actions {
+    display: flex;
+    align-items: center;
+}
+
+.mentor-header {
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.editor-quick-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background: #111a2a;
+    border: 1px solid #263247;
+    border-radius: 12px;
+}
+
+.qa-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.qa-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #cbd5e1;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.qa-btn:hover {
+    background: #334155;
+    color: #f8fafc;
+    border-color: #6366f1;
+}
+
+.qa-btn.viva-qa {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: #6366f1;
+    color: #c7d2fe;
+    font-weight: 600;
+}
+
+.qa-btn.viva-qa:hover {
+    background: #6366f1;
+    color: #fff;
+}
+
+.mentor-eyebrow {
+    margin: 0 0 8px;
+    color: #a5b4fc;
+    font-size: 0.7rem;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+}
+
+.mentor-header h1,
+.mentor-panel h2 {
+    margin: 0;
+    color: #f8fafc;
+}
+
+.mentor-header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    letter-spacing: -0.04em;
+}
+
+.mentor-subtitle {
+    margin: 10px 0 0;
+    color: #9ca3af;
+}
+
+.mentor-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #d1d5db;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.mentor-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: #818cf8;
+}
+
+.mentor-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(290px, 0.8fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.editor-panel,
+.mentor-panel {
+    overflow: hidden;
+    border: 1px solid #263247;
+    border-radius: 16px;
+    background: #111a2a;
+    box-shadow: 0 18px 50px rgb(0 0 0 / 16%);
+}
+
+.editor-toolbar {
+    min-height: 54px;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #263247;
+    color: #cbd5e1;
+    font-size: 0.85rem;
+}
+
+.editor-toolbar select {
+    padding: 7px 30px 7px 10px;
+    border: 1px solid #344256;
+    border-radius: 8px;
+    color: #f8fafc;
+    background: #182337;
+}
+
+.editor-note {
+    margin-left: auto;
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+.diagnostic-summary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 12px 16px;
+    color: #cbd5e1;
+    font-size: 0.78rem;
+}
+
+.diagnostic-summary span {
+    color: #94a3b8;
+}
+
+.mentor-panel {
+    padding: 20px;
+}
+
+.mentor-panel-heading {
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.mentor-panel h2 {
+    font-size: 1.25rem;
+}
+
+.mentor-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #64748b;
+}
+
+.mentor-indicator.is-on {
+    background: #34d399;
+    box-shadow: 0 0 14px rgb(52 211 153 / 45%);
+}
+
+.field-label {
+    display: block;
+    margin: 16px 0 8px;
+    color: #d1d5db;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.mentor-textarea {
+    display: block;
+    width: 100%;
+    resize: vertical;
+    padding: 11px 12px;
+    border: 1px solid #344256;
+    border-radius: 9px;
+    outline: none;
+    color: #e5e7eb;
+    background: #0b1220;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.mentor-textarea:focus,
+.editor-toolbar select:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgb(129 140 248 / 14%);
+}
+
+.compiler-output {
+    min-height: 94px;
+}
+
+.question-context {
+    min-height: 72px;
+}
+
+.mentor-textarea::placeholder {
+    color: #718096;
+}
+
+.field-hint,
+.request-note,
+.safety-note {
+    color: #94a3b8;
+    font-size: 0.72rem;
+    line-height: 1.5;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.hint-button {
+    width: 100%;
+    margin-top: 18px;
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 9px;
+    color: #0b1220;
+    background: #a5b4fc;
+    font-weight: 750;
+    transition: background 120ms ease, opacity 120ms ease;
+}
+
+.hint-button:hover:not(:disabled) {
+    background: #c7d2fe;
+}
+
+.hint-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.request-note {
+    margin: 9px 0 0;
+}
+
+.mentor-message {
+    margin: 12px 0 0;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.error-message {
+    color: #fca5a5;
+}
+
+.status-message {
+    color: #a5b4fc;
+}
+
+.hint-card {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #3c4770;
+    border-radius: 11px;
+    background: #171f36;
+}
+
+.hint-card .mentor-eyebrow {
+    margin-bottom: 10px;
+}
+
+.hint-text {
+    margin: 0;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+}
+
+.hint-actions {
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 14px;
+}
+
+.hint-actions button {
+    padding: 7px 10px;
+    border: 1px solid #475569;
+    border-radius: 7px;
+    color: #e0e7ff;
+    background: #222c45;
+    font-size: 0.75rem;
+}
+
+.hint-actions button:hover {
+    background: #303d5d;
+}
+
+.speech-toggle {
+    margin-top: 20px;
+    white-space: normal;
+}
+
+.speech-toggle span {
+    font-size: 0.78rem;
+}
+
+.safety-note {
+    margin: 18px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid #263247;
+}
+
+@media (max-width: 900px) {
+    .mentor-workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .mentor-panel {
+        order: -1;
+    }
+}
+
+@media (max-width: 560px) {
+    .mentor-app {
+        padding-top: 22px;
+    }
+
+    .mentor-header {
+        align-items: flex-start;
+    }
+
+    .mentor-header .mentor-toggle {
+        padding-top: 26px;
+    }
+
+    .editor-note {
+        display: none;
+    }
+}
