@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Mic, Layers, ChevronDown, Sparkles, Sun, Moon } from 'lucide-react';
+import { Search, Mic, Layers, ChevronDown, Sparkles } from 'lucide-react';
 import { mockData } from '../../data/mockData';
 
 export const Topbar = ({
@@ -11,9 +11,7 @@ export const Topbar = ({
   onClearSelectedCourse,
   onRefresh,
   onOpenVoiceTutor,
-  onNavigate,
-  theme = 'dark-plum',
-  onToggleTheme
+  onNavigate
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -243,31 +241,6 @@ export const Topbar = ({
           >
             <Mic size={14} color="#a855f7" />
             <span>Voice Tutor</span>
-          </button>
-        )}
-
-        {/* Theme Toggle Button (Light Mode / Dark-Plum Mode) */}
-        {onToggleTheme && (
-          <button
-            onClick={onToggleTheme}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-full)',
-              background: theme === 'light' ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.05)',
-              border: theme === 'light' ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid var(--border-subtle)',
-              color: theme === 'light' ? '#d97706' : '#cbd5e1',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease'
-            }}
-            title={theme === 'light' ? 'Switch to Dark-Plum Mode' : 'Switch to Light Mode'}
-          >
-            {theme === 'light' ? <Sun size={14} color="#d97706" /> : <Moon size={14} color="#c4b5fd" />}
-            <span>{theme === 'light' ? 'Light' : 'Dark'}</span>
           </button>
         )}
 

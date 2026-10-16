@@ -38,22 +38,6 @@ export function App() {
   const [toastMessage, setToastMessage] = useState(null);
   const [showVoiceTutor, setShowVoiceTutor] = useState(false);
 
-  // Theme Management (Light Mode / Dark-Plum Mode)
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('mentos_theme') || 'dark-plum';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('mentos_theme', theme);
-  }, [theme]);
-
-  const handleToggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark-plum' : 'light';
-    setTheme(nextTheme);
-    showToast(`Theme updated: switched to ${nextTheme === 'light' ? 'Light Mode' : 'Dark-Plum Mode'}`);
-  };
-
   // Poll Health
   const checkBackendHealth = async () => {
     try {
@@ -181,8 +165,6 @@ export function App() {
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
         onOpenVoiceTutor={() => setShowVoiceTutor(true)}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
       />
 
       {/* 2. Main Content Area */}
@@ -196,9 +178,6 @@ export function App() {
           onClearSelectedCourse={() => setSelectedCourse(null)}
           onRefresh={checkBackendHealth}
           onOpenVoiceTutor={() => setShowVoiceTutor(true)}
-          onNavigate={setActiveTab}
-          theme={theme}
-          onToggleTheme={handleToggleTheme}
         />
 
         {/* Toast Alert */}
