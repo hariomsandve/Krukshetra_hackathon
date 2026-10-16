@@ -6,6 +6,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 let currentRole = localStorage.getItem('adaptiq_role') || 'student';
+let currentToken = localStorage.getItem('adaptiq_token') || null;
 
 export const setStoredRole = (role) => {
   currentRole = role;
@@ -14,10 +15,22 @@ export const setStoredRole = (role) => {
 
 export const getStoredRole = () => currentRole;
 
+export const setStoredToken = (token) => {
+  currentToken = token;
+  if (token) {
+    localStorage.setItem('adaptiq_token', token);
+  } else {
+    localStorage.removeItem('adaptiq_token');
+  }
+};
+
+export const getStoredToken = () => currentToken;
+
 export const getAuthHeaders = () => {
+  const token = currentToken || `dev-${currentRole}`;
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer dev-${currentRole}`
+    'Authorization': `Bearer ${token}`
   };
 };
 

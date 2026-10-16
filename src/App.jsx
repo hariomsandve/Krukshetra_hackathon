@@ -17,7 +17,8 @@ import { VoiceTutorModal } from './components/voice/VoiceTutorModal';
 import { MentosChatDashboard } from './components/chat/MentosChatDashboard';
 import { LoadingPage } from './components/auth/LoadingPage';
 import { LoginPage } from './components/auth/LoginPage';
-import { api, getStoredRole, setStoredRole } from './services/api';
+import { api, getStoredRole, setStoredRole, setStoredToken } from './services/api';
+import { firebaseSignOut } from './services/firebase';
 import { Plus, GitBranch, Layers, Sparkles } from 'lucide-react';
 
 export function App() {
@@ -126,6 +127,9 @@ export function App() {
     setUserProfile(userData);
     localStorage.setItem('adaptiq_authenticated', 'true');
     localStorage.setItem('adaptiq_user', JSON.stringify(userData));
+    if (userData.token) {
+      setStoredToken(userData.token);
+    }
     if (userData.role) {
       handleRoleChange(userData.role);
     }
@@ -138,6 +142,9 @@ export function App() {
     setUserProfile(null);
     localStorage.removeItem('adaptiq_authenticated');
     localStorage.removeItem('adaptiq_user');
+    localStorage.removeItem('adaptiq_token');
+    setStoredToken(null);
+    firebaseSignOut();
     showToast("Signed out successfully.");
   };
 

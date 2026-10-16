@@ -9,7 +9,7 @@ import firebase_admin
 from firebase_admin import auth, credentials
 
 from app.config import get_settings
-from app.database import get_database
+from app.database import get_database, mongo_manager
 from app.models.user import UserInDB, UserRole
 
 logger = logging.getLogger("uvicorn.error")
@@ -95,8 +95,7 @@ async def verify_token(
 
 
 async def get_current_user(
-    token_payload: dict = Depends(verify_token),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    token_payload: dict = Depends(verify_token)
 ) -> dict:
     """Retrieves current user from MongoDB, auto-provisioning as Student if first login."""
     firebase_uid = token_payload.get("uid")
@@ -106,19 +105,31 @@ async def get_current_user(
             detail="Invalid token: missing UID"
         )
 
+    email = token_payload.get("email", f"{firebase_uid}@adaptiq.io")
+    display_name = token_payload.get("name") or token_payload.get("email", "").split("@")[0] or "Google User"
+
+    # Special provision for dev users
+    role = UserRole.STUDENT.value
+    if token_payload.get("is_dev") and "dev_user_" in firebase_uid:
+        role = firebase_uid.replace("dev_user_", "")
+
+    db = mongo_manager.db
+    if db is None:
+        return {
+            "firebase_uid": firebase_uid,
+            "email": email,
+            "display_name": display_name,
+            "role": role,
+            "branch": None,
+            "year": None,
+            "skills": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+
     user = await db.users.find_one({"firebase_uid": firebase_uid})
 
     if not user:
-        # Auto-provision new user on first authenticated request
-        # New users ALWAYS start with the default Student role
-        email = token_payload.get("email", f"{firebase_uid}@adaptiq.io")
-        display_name = token_payload.get("name") or token_payload.get("email", "").split("@")[0] or "New Student"
-
-        # Special provision for dev users
-        role = UserRole.STUDENT.value
-        if token_payload.get("is_dev") and "dev_user_" in firebase_uid:
-            role = firebase_uid.replace("dev_user_", "")
-
         new_user = {
             "firebase_uid": firebase_uid,
             "email": email,

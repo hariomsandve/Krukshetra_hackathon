@@ -19,6 +19,7 @@ import {
   User,
   UserPlus
 } from 'lucide-react';
+import { signInWithGoogle } from '../../services/firebase';
 
 export const LoginPage = ({ onLogin }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -29,6 +30,7 @@ export const LoginPage = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   // Role presets for quick demonstration
@@ -97,6 +99,39 @@ export const LoginPage = ({ onLogin }) => {
       }
       setIsSubmitting(false);
     }, 600);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    setErrorMessage('');
+    try {
+      const { user, idToken } = await signInWithGoogle();
+      const role = selectedRole || 'student';
+      if (onLogin) {
+        onLogin({
+          role: role,
+          email: user.email,
+          name: user.displayName || user.email.split('@')[0],
+          photoURL: user.photoURL,
+          uid: user.uid,
+          badge: `${role.charAt(0).toUpperCase() + role.slice(1)} • Google Verified`,
+          token: idToken
+        });
+      }
+    } catch (err) {
+      console.error("Google Auth error:", err);
+      let msg = err.message || "Failed to sign in with Google";
+      if (err.code === "auth/popup-closed-by-user") {
+        msg = "Google sign-in popup was closed. Please try again.";
+      } else if (err.code === "auth/unauthorized-domain") {
+        msg = "Authorized domain error. Please add localhost to Firebase authorized domains.";
+      } else if (err.code === "auth/popup-blocked") {
+        msg = "Sign-in popup was blocked by browser. Please allow popups for localhost.";
+      }
+      setErrorMessage(msg);
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -722,6 +757,83 @@ export const LoginPage = ({ onLogin }) => {
                 </span>
               )}
             </div>
+
+            {/* Divider */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                margin: '18px 0 14px 0'
+              }}
+            >
+              <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.08)' }} />
+              <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                or continue with
+              </span>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(255, 255, 255, 0.08)' }} />
+            </div>
+
+            {/* Google Sign-in Button */}
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isGoogleLoading || isSubmitting}
+              style={{
+                width: '100%',
+                padding: '10px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                color: '#ffffff',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                cursor: isGoogleLoading ? 'wait' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                transition: 'all 0.15s ease',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.09)';
+                e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
+              }}
+            >
+              {isGoogleLoading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>Connecting to Google...</span>
+                </>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15Z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z"
+                    />
+                  </svg>
+                  <span>Continue with Google</span>
+                </>
+              )}
+            </button>
           </form>
 
           {/* Quick 1-Click Launch Bar for Hackathon judges/users */}
