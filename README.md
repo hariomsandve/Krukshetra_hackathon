@@ -1,90 +1,146 @@
-# Adaptive Learning and Assessment Portal 🎓
+# AdaptIQ — Adaptive Learning and Assessment Portal 🎓
 
-**Personalized Learning. Adaptive Assessments. Measurable Progress.**
+**Personalized Learning. Adaptive Assessments. Real-Time Gemini Multimodal Voice Tutor.**
 
-The Adaptive Learning and Assessment Portal is an educational platform designed to personalize the learning experience based on a student's performance, knowledge gaps, and learning progress.
+AdaptIQ is a full-stack educational platform built with **React + TypeScript + Vite**, **Python FastAPI**, **MongoDB Atlas**, and **Google Gemini Multimodal Live API**. It personalizes the learning experience based on student mastery, concept dependency graphs (DAGs), automated code execution, and real-time bidirectional conversational AI voice tutoring.
 
-The platform aims to help students learn at their own pace while enabling trainers and evaluators to assess understanding through quizzes, coding challenges, and performance analytics.
+---
 
-## 🚀 Problem Statement
+## 🎙️ Real-Time Gemini Live Conversational Voice Tutor
 
-Traditional learning platforms often provide the same learning content and assessments to every student, regardless of their current knowledge or individual learning needs.
+AdaptIQ features a real-time conversational AI voice tutor powered directly by Google's official **Gemini Multimodal Live API** (`gemini-2.5-flash-native-audio-latest`).
 
-Students may struggle to identify their knowledge gaps, while trainers may find it difficult to track individual progress and determine whether students genuinely understand the concepts they have studied.
+### 🌟 Key Voice Capabilities
+- **Native Bidirectional Audio Streaming**: Uses Web Audio API to capture raw 16kHz mono PCM microphone input and stream it directly over WebSocket to FastAPI. Receives high-fidelity 24kHz mono PCM audio chunks from Gemini with gapless playback.
+- **Voice Activity Detection & Interruption (Barge-In)**: The student can speak at any time to interrupt the tutor naturally. Gemini Live emits interruption signals (`interrupted = true`), causing the client audio buffer to immediately flush and listen.
+- **Multilingual Support (English, Hindi, Hinglish)**: Fluid language understanding and spoken response in English, Hindi, and natural Hinglish.
+- **Configurable Native Voices**: Support for official Google Gemini prebuilt voices: `Puck` (Engaging), `Aoede` (Warm), `Charon` (Academic), `Fenrir` (Fast), and `Kore` (Calm).
+- **Reactive Animated Voice Orb**: Canvas-driven visualizer with dynamic gradients that morphs and expands in real-time based on audio volume, voice activity, and thinking states.
+- **Context-Aware Socratic Guidance**: Carries student course, concept, and question context into the Live session. Offers intuitive analogies and asks guiding questions instead of simply blurting out answers.
+- **Dual Spoken Transcription**: Streams live speech-to-text tokens for both student microphone input and tutor responses.
+- **Minimal Data Retention**: Stores session takeaways and metadata in MongoDB Atlas only upon explicit student save action (`/api/v1/voice/sessions/save`). Never stores raw audio recordings.
 
-## 💡 Our Solution
+---
 
-The platform aims to create a personalized learning and assessment environment where learning recommendations and assessment difficulty can adapt to student performance.
+## 🏗️ Architecture & Voice Data Flow
 
-It also aims to provide evidence of student understanding through assessment results, coding submissions, and explain-your-code activities.
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student as Student (Browser)
+    participant Client as React VoiceClient (Web Audio API)
+    participant FastAPI as FastAPI WebSocket (/api/v1/voice/ws)
+    participant Gemini as Gemini Live Multimodal API
+    participant MongoDB as MongoDB Atlas
 
-## ✨ Key Features
+    Student->>Client: Clicks "Voice Tutor" / Grants Mic Permission
+    Client->>FastAPI: WebSocket Connect (?token=dev-student&voice=Puck)
+    FastAPI->>FastAPI: Verify Firebase Token / Role
+    FastAPI->>Gemini: AsyncLive.connect(gemini-2.5-flash-native-audio-latest)
+    Gemini-->>FastAPI: Session Ready
+    FastAPI-->>Client: {"type": "status", "state": "connected"}
 
-### 👨‍🎓 Student Portal
-- Personalized student dashboard.
-- Access to learning materials and topic-wise modules.
-- Adaptive quizzes and assessments.
-- Coding challenges with automated evaluation.
-- Progress tracking and identification of knowledge gaps.
-- Recommendations for topics that need improvement.
-- Assessment history and performance reports.
+    loop Continuous Audio Streaming
+        Student->>Client: Speaks into Microphone
+        Client->>FastAPI: 16kHz Int16 PCM Audio Chunks
+        FastAPI->>Gemini: send_realtime_input(audio/pcm;rate=16000)
+        Gemini-->>FastAPI: 24kHz Int16 PCM Audio + Live Transcription Tokens
+        FastAPI-->>Client: {"type": "audio", "data": "base64...", "sample_rate": 24000}
+        Client->>Student: Gapless 24kHz Audio Playback + Transcript Display
+    end
 
-### 👨‍🏫 Trainer Portal
-- Create and manage courses and learning modules.
-- Upload learning resources and assessment questions.
-- Configure quizzes and coding challenges.
-- Monitor student performance and topic-wise progress.
-- Identify concepts where students commonly struggle.
+    opt Student Interrupts (Barge-In)
+        Student->>Client: Speaks while Tutor is talking
+        Gemini-->>FastAPI: server_content.interrupted = true
+        FastAPI-->>Client: {"type": "interrupted"}
+        Client->>Client: Immediately Stop Audio Playback & Clear Queue
+    end
 
-### 🧑‍⚖️ Evaluator Portal
-- Review assessment submissions.
-- Evaluate coding solutions and explanations.
-- Inspect assessment history and relevant activity records.
-- Compare demonstrated performance across learning objectives.
+    opt Save Takeaways
+        Student->>Client: Clicks "Save Session"
+        Client->>FastAPI: POST /api/v1/voice/sessions/save
+        FastAPI->>MongoDB: Insert session metadata & summary
+    end
+```
 
-### 🧠 Adaptive Learning Engine
-- Analyze student assessment performance.
-- Identify weak and strong topics.
-- Recommend suitable learning resources.
-- Adjust subsequent question difficulty based on performance.
-- Track progress as students practice and improve.
+---
 
-### 💻 Coding Assessment
-- Support programming challenges.
-- Execute submitted code in a controlled
+## ⚙️ Environment Variables Configuration
 
-## Voice Coding Mentor
+### Backend (`backend/.env`)
+```bash
+# Server Configuration
+ENVIRONMENT=development
+HOST=127.0.0.1
+PORT=8000
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 
-The coding workspace uses Monaco Editor diagnostics when available and can also
-accept output copied from an existing compiler or runner. It does not execute
-student code. No code runner or isolated execution service exists in this
-repository; use a separate sandboxed runner with time, memory, filesystem, and
-network restrictions before enabling code execution.
+# MongoDB Atlas
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority
+MONGODB_DB_NAME=adaptiq_learning_portal
 
-### Setup
+# Firebase Authentication
+FIREBASE_PROJECT_ID=ps-2-adaptive-portal
+FIREBASE_SERVICE_ACCOUNT_KEY=./firebase_service_account.json
 
-1. Install Node.js 20.19+ and Python 3.10+.
-2. Install frontend packages with `npm install`, then start the portal with
-   `npm run dev`.
-3. Install backend packages with `python -m pip install -r backend/requirements.txt`.
-4. If `backend/.env` does not exist, copy `backend/.env.example` to create it.
-   Otherwise, preserve the existing file and add only the missing variable
-   names. Set `GEMINI_API_KEY` on the backend and `FRONTEND_ORIGINS` to the
-   exact frontend origin. The optional `GEMINI_MODEL` defaults to
-   `gemini-2.5-flash`.
-5. Start the API from the repository root with
-   `python -m uvicorn main:app --app-dir backend --reload`.
-6. Run the backend unit tests from the repository root with
-   `python -m unittest backend.test_mentor`.
+# Google Gemini Multimodal Live API
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_VOICE_MODEL=gemini-2.5-flash-native-audio-latest
+GEMINI_VOICE_NAME=Puck
+```
 
-The frontend sends requests to `http://localhost:8000` by default. Set
-`VITE_API_BASE_URL` in a local frontend `.env.local` to change it. The backend
-limits request sizes, supports a fixed language list, and does not save mentor
-events or open a MongoDB connection. The existing MongoDB test script and
-portal page sources are retained unchanged.
+> [!SECURITY]
+> The `GEMINI_API_KEY` is kept **strictly on the backend server**. It is never exposed in Vite variables, React client code, browser network payloads, or git repositories.
 
-The hint endpoint is not connected to an authentication system because this
-repository contains none. Before public deployment, protect it with the
-portal's authentication and server-side rate limiting. CORS is not
-authentication. Student code and diagnostics are sent to Gemini when a hint is
-requested; review the provider's data handling requirements before use.
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+- Python 3.10+ installed
+- Node.js 18+ and npm installed
+- Google Gemini API Key with Multimodal Live API access
+
+### 2. Backend Setup
+```bash
+cd backend
+python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+The FastAPI backend will run on `http://127.0.0.1:8000`. You can inspect endpoints via Swagger at `http://127.0.0.1:8000/docs`.
+
+### 3. Frontend Setup
+```bash
+# In project root:
+npm install
+npm run dev
+```
+Open `http://localhost:5173` in any modern browser (Chrome, Edge, Firefox, Brave).
+
+---
+
+## 🧪 Testing the Voice Tutor
+
+1. Navigate to `http://localhost:5173` in Google Chrome or Microsoft Edge.
+2. In the topbar or bottom-right corner, click the **AI Voice Tutor** button.
+3. Grant microphone permissions when prompted by your browser.
+4. Watch the **Reactive Voice Orb** pulse and transition from connecting to listening.
+5. Speak naturally into your microphone (e.g. *"Hello tutor! Can you explain recursion in Hinglish?"*).
+6. Listen to the 24kHz spoken response and observe the live transcript stream.
+7. Test **barge-in interruption**: speak while the tutor is talking to observe immediate playback interruption and transition back to listening.
+8. Click **Save Session** to store the learning takeaways into MongoDB.
+
+---
+
+## 💰 Costs, Quotas & Usage Considerations
+
+1. **Model**: `gemini-2.5-flash-native-audio-latest` is Google's low-latency multimodal native audio model.
+2. **Audio Pricing**: Audio tokens are billed based on input audio seconds and output audio seconds.
+3. **Session Duration Limits**: Client sessions automatically track duration. It is recommended to keep interactive viva sessions between 5 to 15 minutes to optimize token costs.
+4. **VAD (Voice Activity Detection)**: Real-time silence suppression minimizes idle token consumption when the student is listening.
