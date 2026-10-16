@@ -18,7 +18,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ChevronsUpDown,
-  Compass
+  Compass,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export const Sidebar = ({
@@ -27,7 +29,9 @@ export const Sidebar = ({
   role,
   isCollapsed,
   onToggleCollapse,
-  onOpenVoiceTutor
+  onOpenVoiceTutor,
+  theme = 'dark-plum',
+  onToggleTheme
 }) => {
   const learningSuiteItems = [
     { id: 'chat', label: 'Chat History', icon: MessageSquare },
@@ -410,6 +414,25 @@ export const Sidebar = ({
               >
                 <HelpCircle size={14} /> Help
               </button>
+              {onToggleTheme && (
+                <button
+                  onClick={onToggleTheme}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: theme === 'light' ? '#d97706' : '#c4b5fd',
+                    fontSize: '0.75rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer'
+                  }}
+                  title={theme === 'light' ? 'Switch to Dark-Plum Mode' : 'Switch to Light Mode'}
+                >
+                  {theme === 'light' ? <Sun size={14} /> : <Moon size={14} />}
+                  <span>{theme === 'light' ? 'Light' : 'Dark'}</span>
+                </button>
+              )}
               <button
                 style={{
                   background: 'none',
