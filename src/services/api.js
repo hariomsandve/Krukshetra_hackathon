@@ -3,13 +3,15 @@
  * Connects to FastAPI backend and handles authentication, fallback data, and diagnostics.
  */
 
+import { mockData } from '../data/mockData';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
-let currentRole = localStorage.getItem('adaptiq_role') || 'student';
+let currentRole = localStorage.getItem('mentos_role') || 'student';
 
 export const setStoredRole = (role) => {
   currentRole = role;
-  localStorage.setItem('adaptiq_role', role);
+  localStorage.setItem('mentos_role', role);
 };
 
 export const getStoredRole = () => currentRole;
@@ -54,6 +56,9 @@ export const api = {
     }
   },
 
+  // Prototype Mock Data Accessor
+  getMockData: () => mockData,
+
   // 2. Auth & User Profile
   getCurrentUser: async () => {
     try {
@@ -62,14 +67,15 @@ export const api = {
       });
       return await handleResponse(res);
     } catch (err) {
-      // Fallback profile matching active session role
       return {
-        id: `usr_${currentRole}`,
+        id: mockData.currentUser.id,
         firebase_uid: `dev_user_${currentRole}`,
-        email: `${currentRole}@adaptiq.io`,
-        display_name: `${currentRole.charAt(0).toUpperCase() + currentRole.slice(1)} User`,
+        email: mockData.currentUser.email,
+        display_name: mockData.currentUser.displayName,
         role: currentRole,
-        skills: ["Python", "Algorithms", "FastAPI"],
+        cohort: mockData.currentUser.cohort,
+        preferences: mockData.currentUser.preferences,
+        skills: ["Java", "Python", "Data Structures", "Algorithms"],
         is_fallback: true
       };
     }
@@ -369,118 +375,33 @@ export const api = {
   }
 };
 
-// Fallback Default Courses
-const DEFAULT_COURSES = [
-  {
-    id: "course-1",
-    title: "Data Structures & Algorithmic Problem Solving",
-    description: "Build robust foundational understanding from memory allocations and pointers to recursive trees, dynamic programming, and DAG cycle detection.",
-    tags: ["Algorithms", "Data Structures", "Python"],
-    concept_count: 6,
-    creator_email: "trainer@adaptiq.io",
-    is_published: true
-  },
-  {
-    id: "course-2",
-    title: "Enterprise Backend Architecture with FastAPI & MongoDB",
-    description: "Design reactive, asynchronous microservice architectures with Motor MongoDB Atlas, Firebase ID token verification, and RBAC authorization.",
-    tags: ["FastAPI", "MongoDB Atlas", "Python", "Security"],
-    concept_count: 5,
-    creator_email: "trainer@adaptiq.io",
-    is_published: true
-  },
-  {
-    id: "course-3",
-    title: "Adaptive Learning Systems & Integrity Analytics",
-    description: "Develop proctored assessment engines, replayable editor event streams, and explainable integrity telemetry for online evaluations.",
-    tags: ["EdTech", "Analytics", "Proctoring"],
-    concept_count: 4,
-    creator_email: "trainer@adaptiq.io",
-    is_published: true
-  }
-];
+// Fallback Default Courses from mockData
+const DEFAULT_COURSES = mockData.subjects.map(sub => ({
+  id: sub.id,
+  title: sub.title,
+  description: sub.description,
+  tags: [sub.level, sub.slug, sub.color],
+  concept_count: sub.topicCount,
+  creator_email: "mentors@mentos.ai",
+  progressPercent: sub.progressPercent,
+  icon: sub.icon,
+  is_published: true
+}));
 
-// Fallback Default DAGs
+// Fallback Default DAGs from mockData
 const DEFAULT_DAGS = {
-  "course-1": {
-    course_id: "course-1",
-    course_title: "Data Structures & Algorithmic Problem Solving",
-    total_concepts: 6,
-    nodes: [
-      {
-        id: "c-arrays",
-        title: "Memory Addressing & Arrays",
-        description: "Contiguous memory layout, cache locality, and pointer indexing.",
-        difficulty: "beginner",
-        tier_level: 0,
-        status: "mastered",
-        prerequisites: [],
-        learning_objectives: ["Calculate memory offsets", "Contrast stack vs heap allocation"],
-        estimated_minutes: 25
-      },
-      {
-        id: "c-pointers",
-        title: "Pointers & References",
-        description: "Memory dereferencing, reference passing, and sentinel bounds.",
-        difficulty: "beginner",
-        tier_level: 0,
-        status: "mastered",
-        prerequisites: [],
-        learning_objectives: ["Inspect memory addresses", "Avoid null pointer dereferences"],
-        estimated_minutes: 30
-      },
-      {
-        id: "c-linked-lists",
-        title: "Linked Nodes & Sentinel Lists",
-        description: "Dynamic non-contiguous node chains and O(1) pointer updates.",
-        difficulty: "beginner",
-        tier_level: 1,
-        status: "mastered",
-        prerequisites: ["c-arrays", "c-pointers"],
-        learning_objectives: ["Implement singly linked lists", "Detect reference cycles"],
-        estimated_minutes: 35
-      },
-      {
-        id: "c-stacks",
-        title: "Stacks & Monotonic Queues",
-        description: "Call-stack recursion semantics and monotonic stack patterns.",
-        difficulty: "intermediate",
-        tier_level: 2,
-        status: "in-progress",
-        prerequisites: ["c-linked-lists"],
-        learning_objectives: ["Solve next greater element in O(n)", "Simulate call stacks"],
-        estimated_minutes: 40
-      },
-      {
-        id: "c-trees-bst",
-        title: "Binary Search Trees",
-        description: "Hierarchical subtrees, left/right ordering invariants, and recursive traversal.",
-        difficulty: "intermediate",
-        tier_level: 2,
-        status: "weak",
-        prerequisites: ["c-linked-lists"],
-        learning_objectives: ["Validate BST properties", "Execute recursive DFS traversals"],
-        estimated_minutes: 45
-      },
-      {
-        id: "c-graphs-dfs",
-        title: "DAG Cycle Detection & Topological Sort",
-        description: "Adjacency lists, 3-color DFS cycle validation, and Kahn's topological sort.",
-        difficulty: "advanced",
-        tier_level: 3,
-        status: "locked",
-        prerequisites: ["c-stacks", "c-trees-bst"],
-        learning_objectives: ["Identify prerequisite cycle back-edges", "Compute dependency tiers"],
-        estimated_minutes: 55
-      }
-    ],
-    edges: [
-      { source: "c-arrays", target: "c-linked-lists" },
-      { source: "c-pointers", target: "c-linked-lists" },
-      { source: "c-linked-lists", target: "c-stacks" },
-      { source: "c-linked-lists", target: "c-trees-bst" },
-      { source: "c-stacks", target: "c-graphs-dfs" },
-      { source: "c-trees-bst", target: "c-graphs-dfs" }
-    ]
+  "sub-dsa": {
+    course_id: "sub-dsa",
+    course_title: "Data Structures & Algorithms",
+    total_concepts: mockData.concepts.length,
+    nodes: mockData.concepts,
+    edges: mockData.conceptEdges
+  },
+  "default": {
+    course_id: "default",
+    course_title: "Data Structures & Algorithms",
+    total_concepts: mockData.concepts.length,
+    nodes: mockData.concepts,
+    edges: mockData.conceptEdges
   }
 };

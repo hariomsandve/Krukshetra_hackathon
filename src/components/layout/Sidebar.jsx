@@ -455,14 +455,14 @@ export const Sidebar = ({
                     flexShrink: 0
                   }}
                 >
-                  AC
+                  AM
                 </div>
                 <div>
                   <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#ffffff', lineHeight: 1.2 }}>
-                    Aria Chen
+                    Alex Morgan
                   </div>
                   <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
-                    CS Junior • Pro Learner
+                    CS Year 3 • Pro Learner
                   </div>
                 </div>
               </div>

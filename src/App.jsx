@@ -15,6 +15,7 @@ import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { VoiceFloatingButton } from './components/voice/VoiceFloatingButton';
 import { VoiceTutorModal } from './components/voice/VoiceTutorModal';
 import { MentosChatDashboard } from './components/chat/MentosChatDashboard';
+import { CodeVivaWorkspace } from './components/viva/CodeVivaWorkspace';
 import { api, getStoredRole, setStoredRole } from './services/api';
 import { Plus, GitBranch, Layers, Sparkles } from 'lucide-react';
 
@@ -335,15 +336,15 @@ export function App() {
             <CodingWorkspace
               onBack={() => setActiveTab('dashboard')}
               onOpenVoiceTutor={() => setShowVoiceTutor(true)}
+              onStartViva={() => setActiveTab('viva')}
             />
           )}
 
           {/* AI CODE VIVA */}
           {activeTab === 'viva' && (
-            <MentosChatDashboard
-              onNavigate={setActiveTab}
+            <CodeVivaWorkspace
+              onBack={() => setActiveTab('coding-workspace')}
               onOpenVoiceTutor={() => setShowVoiceTutor(true)}
-              selectedCourse={selectedCourse}
             />
           )}
 

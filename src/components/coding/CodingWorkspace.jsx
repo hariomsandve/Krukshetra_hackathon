@@ -15,8 +15,10 @@ import {
   Cpu,
   Check
 } from 'lucide-react';
+import { mockData } from '../../data/mockData';
 
-export const CodingWorkspace = ({ onBack, onOpenVoiceTutor }) => {
+export const CodingWorkspace = ({ onBack, onOpenVoiceTutor, onStartViva }) => {
+  const [selectedAssessmentId, setSelectedAssessmentId] = useState('assessment-two-sum');
   const [language, setLanguage] = useState('java');
   const [activeLeftTab, setActiveLeftTab] = useState('description');
   const [activeBottomTab, setActiveBottomTab] = useState('results');
@@ -24,16 +26,115 @@ export const CodingWorkspace = ({ onBack, onOpenVoiceTutor }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [testStatus, setTestStatus] = useState('passed');
 
-  const javaStarter = `import java.util.*;
+  const assessments = [
+    {
+      id: 'assessment-two-sum',
+      title: '1. Two Sum',
+      difficulty: 'Easy',
+      totalPoints: 100,
+      description: 'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice.',
+      hint: 'A HashMap can look up complements in O(1) average time. Traverse the array and store indices of elements seen so far.',
+      starterCode: {
+        java: `import java.util.*;
 
-// Design an LRU Cache backed by Doubly-Linked Sentinel Nodes + HashMap
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> seen = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int need = target - nums[i];
+            if (seen.containsKey(need)) {
+                return new int[]{seen.get(need), i};
+            }
+            seen.put(nums[i], i);
+        }
+        return new int[]{};
+    }
+}`,
+        python: `class Solution:
+    def twoSum(self, nums: list[int], target: int) -> list[int]:
+        seen = {}
+        for i, num in enumerate(nums):
+            need = target - num
+            if need in seen:
+                return [seen[need], i]
+            seen[num] = i
+        return []`
+      },
+      examples: [
+        { input: 'nums = [2,7,11,15], target = 9', output: '[0, 1]' },
+        { input: 'nums = [3,2,4], target = 6', output: '[1, 2]' }
+      ],
+      constraints: [
+        '2 <= nums.length <= 10^4',
+        '-10^9 <= nums[i] <= 10^9',
+        'Only one valid answer exists.'
+      ],
+      testCases: [
+        { id: 1, label: 'Case 1: Standard [2,7,11,15]', time: '2ms', status: 'Passed', input: '[2,7,11,15], 9', expected: '[0,1]' },
+        { id: 2, label: 'Case 2: Middle [3,2,4]', time: '3ms', status: 'Passed', input: '[3,2,4], 6', expected: '[1,2]' },
+        { id: 3, label: 'Case 3: Duplicates [3,3]', time: '2ms', status: 'Passed', input: '[3,3], 6', expected: '[0,1]' }
+      ]
+    },
+    {
+      id: 'assessment-reverse-list',
+      title: '206. Reverse Linked List',
+      difficulty: 'Easy',
+      totalPoints: 100,
+      description: 'Given the head of a singly linked list, reverse the list, and return the reversed list.',
+      hint: 'Maintain three pointers: prev, curr, and next. In each step, invert the curr.next reference to point to prev.',
+      starterCode: {
+        java: `class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        while (curr != null) {
+            ListNode nextTemp = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextTemp;
+        }
+        return prev;
+    }
+}`,
+        python: `class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = None
+        curr = head
+        while curr:
+            next_temp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = next_temp
+        return prev`
+      },
+      examples: [
+        { input: 'head = [1,2,3,4,5]', output: '[5,4,3,2,1]' },
+        { input: 'head = [1,2]', output: '[2,1]' }
+      ],
+      constraints: [
+        'The number of nodes in the list is in range [0, 5000].',
+        '-5000 <= Node.val <= 5000',
+        'Follow up: Can you do it iteratively and recursively?'
+      ],
+      testCases: [
+        { id: 1, label: 'Case 1: [1,2,3,4,5]', time: '1ms', status: 'Passed', input: '[1,2,3,4,5]', expected: '[5,4,3,2,1]' },
+        { id: 2, label: 'Case 2: Empty List []', time: '1ms', status: 'Passed', input: '[]', expected: '[]' }
+      ]
+    },
+    {
+      id: 'assessment-lru-cache',
+      title: '146. LRU Cache (Doubly-Linked Sentinel)',
+      difficulty: 'Medium',
+      totalPoints: 100,
+      description: 'Design a data structure that follows the constraints of a Least Recently Used (LRU) cache. Implement LRUCache with O(1) average time complexity for both get and put operations.',
+      hint: 'A Doubly Linked List enables O(1) node extraction and insertion at head/tail. Combine with a hash map to achieve pointer lookup in strict constant time.',
+      starterCode: {
+        java: `import java.util.*;
 
 class LRUCache {
-
     private static class Node {
         int key, val;
         Node prev, next;
-
         Node(int k, int v) { this.key = k; this.val = v; }
     }
 
@@ -83,9 +184,8 @@ class LRUCache {
         head.next.prev = node;
         head.next = node;
     }
-}`;
-
-  const pythonStarter = `class Node:
+}`,
+        python: `class Node:
     def __init__(self, key=0, val=0):
         self.key = key
         self.val = val
@@ -128,14 +228,38 @@ class LRUCache:
         node.next = self.head.next
         node.prev = self.head
         self.head.next.prev = node
-        self.head.next = node
-`;
+        self.head.next = node`
+      },
+      examples: [
+        { input: '["LRUCache", "put", "put", "get"] [[2], [1, 1], [2, 2], [1]]', output: '[null, null, null, 1]' }
+      ],
+      constraints: [
+        '1 <= capacity <= 3000',
+        '0 <= key <= 10^4',
+        '0 <= value <= 10^5',
+        'At most 2 * 10^5 calls will be made to get and put.'
+      ],
+      testCases: [
+        { id: 1, label: 'Case 1: Standard sequence', time: '12ms', status: 'Passed', input: 'cap = 2, put(1,1), put(2,2)', expected: 'get(1) => 1' },
+        { id: 2, label: 'Case 2: Eviction on overflow', time: '15ms', status: 'Passed', input: 'put(3,3) on full cap', expected: 'evict key 2' },
+        { id: 3, label: 'Case 3: Single item cap = 1', time: '11ms', status: 'Passed', input: 'cap = 1', expected: 'evict previous immediately' }
+      ]
+    }
+  ];
 
-  const [code, setCode] = useState(javaStarter);
+  const currentAssessment = assessments.find(a => a.id === selectedAssessmentId) || assessments[0];
+  const [code, setCode] = useState(currentAssessment.starterCode[language] || currentAssessment.starterCode.java);
+
+  const handleAssessmentChange = (id) => {
+    setSelectedAssessmentId(id);
+    const chosen = assessments.find(a => a.id === id) || assessments[0];
+    setCode(chosen.starterCode[language] || chosen.starterCode.java);
+    setSelectedCase(1);
+  };
 
   const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
-    setCode(newLang === 'java' ? javaStarter : pythonStarter);
+    setCode(currentAssessment.starterCode[newLang] || currentAssessment.starterCode.java);
   };
 
   const handleRunTests = () => {
@@ -149,10 +273,10 @@ class LRUCache:
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', background: 'var(--bg-app)', overflow: 'hidden' }}>
-      {/* 1. Header Toolbar (Image 4) */}
+      {/* 1. Header Toolbar */}
       <div
         style={{
-          height: '52px',
+          height: '54px',
           padding: '0 16px',
           display: 'flex',
           alignItems: 'center',
@@ -179,9 +303,28 @@ class LRUCache:
             <ArrowLeft size={16} />
           </button>
 
-          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ffffff' }}>
-            146. LRU Cache (Least Recently Used)
-          </span>
+          {/* Assessment Selector */}
+          <select
+            value={selectedAssessmentId}
+            onChange={(e) => handleAssessmentChange(e.target.value)}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid var(--border-subtle)',
+              color: '#fff',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              padding: '5px 10px',
+              borderRadius: 'var(--radius-sm)',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            {assessments.map(a => (
+              <option key={a.id} value={a.id} style={{ background: '#101827', color: '#fff' }}>
+                {a.title} ({a.difficulty})
+              </option>
+            ))}
+          </select>
 
           {/* Language Selector Dropdown */}
           <div
@@ -189,7 +332,7 @@ class LRUCache:
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '4px 10px',
+              padding: '5px 12px',
               borderRadius: 'var(--radius-sm)',
               background: 'rgba(255, 255, 255, 0.04)',
               border: '1px solid var(--border-subtle)',
@@ -199,19 +342,19 @@ class LRUCache:
             }}
             onClick={() => handleLanguageChange(language === 'java' ? 'python' : 'java')}
           >
-            <span>&lt; &gt; {language === 'java' ? 'Java (OpenJDK 17)' : 'Python 3.11'}</span>
+            <span>&lt; &gt; {language === 'java' ? 'Java 17' : 'Python 3.11'}</span>
             <ChevronDown size={12} />
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
-            onClick={() => setCode(language === 'java' ? javaStarter : pythonStarter)}
+            onClick={() => setCode(currentAssessment.starterCode[language] || currentAssessment.starterCode.java)}
             className="btn btn-secondary"
             style={{ fontSize: '0.75rem', padding: '5px 10px', gap: '4px' }}
             title="Reset code to starter template"
           >
-            <RotateCcw size={12} /> Default
+            <RotateCcw size={12} /> Reset
           </button>
 
           <button
@@ -239,7 +382,7 @@ class LRUCache:
         {/* Left Pane: Problem Spec */}
         <div
           style={{
-            background: 'var(--bg-surface)',
+            background: 'var(--bg-sidebar)',
             borderRight: '1px solid var(--border-subtle)',
             display: 'flex',
             flexDirection: 'column',
@@ -247,38 +390,50 @@ class LRUCache:
           }}
         >
           {/* Tabs */}
-          <div style={{ display: 'flex', borderBottom: '1px solid var(--border-subtle)', padding: '0 16px' }}>
-            {['description', 'hints', 'submissions'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveLeftTab(tab)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: activeLeftTab === tab ? '2px solid #a855f7' : '2px solid transparent',
-                  padding: '12px 14px',
-                  color: activeLeftTab === tab ? '#ffffff' : 'var(--text-muted)',
-                  fontSize: '0.8125rem',
-                  fontWeight: activeLeftTab === tab ? 600 : 500,
-                  cursor: 'pointer',
-                  textTransform: 'capitalize'
-                }}
-              >
-                {tab === 'hints' ? 'Hints (2/3)' : tab === 'submissions' ? 'Submissions (3)' : 'Description'}
-              </button>
-            ))}
+          <div
+            style={{
+              display: 'flex',
+              padding: '0 16px',
+              borderBottom: '1px solid var(--border-subtle)',
+              background: 'rgba(0, 0, 0, 0.2)'
+            }}
+          >
+            <button
+              onClick={() => setActiveLeftTab('description')}
+              style={{
+                background: 'none',
+                border: 'none',
+                borderBottom: activeLeftTab === 'description' ? '2px solid #a855f7' : '2px solid transparent',
+                padding: '10px 12px',
+                color: activeLeftTab === 'description' ? '#fff' : 'var(--text-muted)',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Description
+            </button>
           </div>
 
-          {/* Description Content */}
+          {/* Spec Content Scroll Area */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-            {/* Mentos Co-Pilot Callout (Image 4) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
+                {currentAssessment.difficulty}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                {currentAssessment.totalPoints} Points
+              </span>
+            </div>
+
+            {/* AI Realtime Guide Box */}
             <div
               style={{
-                padding: '14px 16px',
-                borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(99, 102, 241, 0.12) 100%)',
+                padding: '12px 14px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'rgba(168, 85, 247, 0.08)',
                 border: '1px solid rgba(168, 85, 247, 0.3)',
-                marginBottom: '20px'
+                marginBottom: '18px'
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
@@ -287,85 +442,61 @@ class LRUCache:
                   <span>Mentos Adaptive Co-Pilot</span>
                 </div>
                 <span style={{ fontSize: '0.625rem', background: 'rgba(168, 85, 247, 0.25)', color: '#e9d5ff', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                  REALTIME GUIDE
+                  PEDAGOGICAL HINT
                 </span>
               </div>
               <p style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: 1.55 }}>
-                A Doubly Linked List enables <strong>O(1)</strong> node extraction and insertion at head/tail. Combine with a hash map to achieve pointer lookup in strict constant time.
+                {currentAssessment.hint}
               </p>
             </div>
 
             {/* Functional Spec */}
             <h3 style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#ffffff', marginBottom: '10px' }}>
-              Functional Specification
+              Specification
             </h3>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '14px' }}>
-              Design a data structure that follows the constraints of a <strong>Least Recently Used (LRU) cache</strong>.
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '16px' }}>
+              {currentAssessment.description}
             </p>
 
-            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-              Implement the <code>LRUCache</code> class:
-            </p>
+            {/* Examples */}
+            {currentAssessment.examples.map((ex, idx) => (
+              <div key={idx} style={{ marginBottom: '14px' }}>
+                <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff', marginBottom: '6px', textTransform: 'uppercase' }}>
+                  EXAMPLE {idx + 1}
+                </h4>
+                <div
+                  style={{
+                    padding: '10px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    border: '1px solid var(--border-subtle)',
+                    fontFamily: 'monospace',
+                    fontSize: '0.75rem',
+                    color: '#cbd5e1',
+                    lineHeight: 1.6
+                  }}
+                >
+                  <div style={{ color: 'var(--text-muted)', marginBottom: '2px' }}>INPUT</div>
+                  <div>{ex.input}</div>
+                  <div style={{ color: 'var(--text-muted)', marginTop: '6px', marginBottom: '2px' }}>OUTPUT</div>
+                  <div>{ex.output}</div>
+                </div>
+              </div>
+            ))}
 
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.78125rem', color: '#cbd5e1', marginBottom: '18px', paddingLeft: '4px', listStyle: 'none' }}>
-              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span><code>LRUCache(int capacity)</code> Initialize the LRU cache with positive size <code>capacity</code>.</span>
-              </li>
-              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span><code>int get(int key)</code> Return value of <code>key</code> if it exists, otherwise return <code>-1</code>. Mark as most recently accessed.</span>
-              </li>
-              <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                <CheckCircle2 size={14} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span><code>void put(int key, int value)</code> Update or insert key-val. When capacity is exceeded, evict the least recently used key.</span>
-              </li>
-            </ul>
-
-            <div
-              style={{
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid var(--border-subtle)',
-                fontSize: '0.75rem',
-                color: '#c4b5fd',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: '20px'
-              }}
-            >
-              <Cpu size={14} />
-              <span>Goal: <strong>O(1)</strong> average time complexity for both operations.</span>
-            </div>
-
-            {/* Example 1 */}
-            <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
-              EXAMPLE 1
+            {/* Constraints */}
+            <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff', marginBottom: '8px', textTransform: 'uppercase', marginTop: '16px' }}>
+              Constraints
             </h4>
-            <div
-              style={{
-                padding: '12px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid var(--border-subtle)',
-                fontFamily: 'monospace',
-                fontSize: '0.75rem',
-                color: '#cbd5e1',
-                lineHeight: 1.6
-              }}
-            >
-              <div style={{ color: 'var(--text-muted)', marginBottom: '4px' }}>INPUT EXECUTION SEQUENCE</div>
-              <div>["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]</div>
-              <div>[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]</div>
-              <div style={{ color: 'var(--text-muted)', marginTop: '8px' }}>OUTPUT</div>
-              <div>[null, null, null, 1, null, -1, null, -1, 3, 4]</div>
-            </div>
+            <ul style={{ paddingLeft: '16px', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
+              {currentAssessment.constraints.map((c, i) => (
+                <li key={i}>{c}</li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* Right Pane: Code Editor + Bottom Test Execution Panel (Image 4) */}
+        {/* Right Pane: Code Editor + Bottom Test Execution Panel */}
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
           {/* Editor Header Tab */}
           <div
@@ -383,8 +514,8 @@ class LRUCache:
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#a855f7' }} />
-              <strong style={{ color: '#fff' }}>{language === 'java' ? 'LRUCache.java' : 'lru_cache.py'}</strong>
-              <span style={{ color: 'var(--text-muted)' }}>• UTF-8 • Tab Size: 4</span>
+              <strong style={{ color: '#fff' }}>{language === 'java' ? 'Solution.java' : 'solution.py'}</strong>
+              <span style={{ color: 'var(--text-muted)' }}>• UTF-8</span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.6875rem' }}>
@@ -394,7 +525,7 @@ class LRUCache:
               >
                 <Copy size={12} /> Copy
               </button>
-              <span style={{ color: '#34d399' }}>● {language === 'java' ? 'JDK 17 Language Server' : 'Python Server'}</span>
+              <span style={{ color: '#34d399' }}>● {language === 'java' ? 'JDK 17 Language Server' : 'Python 3.11'}</span>
             </div>
           </div>
 
@@ -419,7 +550,7 @@ class LRUCache:
             />
           </div>
 
-          {/* Bottom Test Results Panel (Image 4) */}
+          {/* Bottom Test Results Panel */}
           <div
             style={{
               height: '240px',
@@ -461,7 +592,7 @@ class LRUCache:
                   <CheckCircle2 size={13} color="#10b981" />
                   <span>Test Results</span>
                   <span style={{ fontSize: '0.625rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '1px 5px', borderRadius: '4px' }}>
-                    Passed 3/3
+                    Passed {currentAssessment.testCases.length}/{currentAssessment.testCases.length}
                   </span>
                 </button>
 
@@ -482,46 +613,24 @@ class LRUCache:
                   <Terminal size={13} />
                   <span>Console Output</span>
                 </button>
-
-                <button
-                  onClick={() => setActiveBottomTab('critique')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    padding: '8px 0',
-                    color: activeBottomTab === 'critique' ? '#fff' : 'var(--text-muted)',
-                    fontSize: '0.75rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  <Sparkles size={13} color="#a855f7" />
-                  <span>Viva & Deep Critique</span>
-                </button>
               </div>
 
               {/* Performance Metrics */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
-                <span>Runtime: <strong style={{ color: '#34d399' }}>12ms</strong> (Faster than 89.4%)</span>
-                <span>Memory: <strong style={{ color: '#f8fafc' }}>114.2 MB</strong></span>
+                <span>Runtime: <strong style={{ color: '#34d399' }}>2ms</strong> (Faster than 94.2%)</span>
+                <span>Memory: <strong style={{ color: '#f8fafc' }}>42.1 MB</strong></span>
               </div>
             </div>
 
             {/* Test Cases Sub-body */}
             <div style={{ flex: 1, padding: '12px 16px', display: 'flex', gap: '16px', overflowY: 'auto' }}>
               {/* Cases List */}
-              <div style={{ width: '180px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ width: '200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.04em' }}>
-                  EXECUTION CASES
+                  TEST CASES
                 </span>
 
-                {[
-                  { id: 1, label: 'Case 1', time: '12ms' },
-                  { id: 2, label: 'Case 2 (Eviction)', time: '15ms' },
-                  { id: 3, label: 'Case 3 (Cap = 1)', time: '11ms' }
-                ].map((c) => (
+                {currentAssessment.testCases.map((c) => (
                   <div
                     key={c.id}
                     onClick={() => setSelectedCase(c.id)}
@@ -539,7 +648,7 @@ class LRUCache:
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff' }}>
                       <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
-                      <span>{c.label}</span>
+                      <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '120px' }}>{c.label}</span>
                     </div>
                     <span style={{ color: 'var(--text-muted)', fontSize: '0.6875rem' }}>{c.time}</span>
                   </div>
@@ -548,27 +657,34 @@ class LRUCache:
 
               {/* Case Details */}
               <div style={{ flex: 1, background: 'rgba(0, 0, 0, 0.25)', borderRadius: '6px', padding: '10px 14px', border: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '8px' }}>
-                  <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontWeight: 700 }}>
-                    PASSED
-                  </span>
-                  <span style={{ color: 'var(--text-muted)' }}>Runtime: 12ms • Memory: 48.6 MB</span>
-                </div>
+                {(() => {
+                  const activeTc = currentAssessment.testCases.find(tc => tc.id === selectedCase) || currentAssessment.testCases[0];
+                  return (
+                    <div>
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '8px' }}>
+                        <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontWeight: 700 }}>
+                          PASSED
+                        </span>
+                        <span style={{ color: 'var(--text-muted)' }}>Runtime: {activeTc.time} • Execution OK</span>
+                      </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontFamily: 'monospace' }}>
-                  <div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', marginBottom: '2px' }}>METHOD INVOCATIONS</div>
-                    <div style={{ color: '#cbd5e1' }}>["put", "put", "get", "put", "get", "get"]</div>
-                  </div>
-                  <div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', marginBottom: '2px' }}>PARAMETERS</div>
-                    <div style={{ color: '#cbd5e1' }}>[[1, 1], [2, 2], [1], [3, 3], [2], [3]]</div>
-                  </div>
-                </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontFamily: 'monospace' }}>
+                        <div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', marginBottom: '2px' }}>INPUT</div>
+                          <div style={{ color: '#cbd5e1' }}>{activeTc.input}</div>
+                        </div>
+                        <div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', marginBottom: '2px' }}>EXPECTED OUTPUT</div>
+                          <div style={{ color: '#cbd5e1' }}>{activeTc.expected}</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
 
-            {/* Floating Live Viva Prompt Box bottom right (Image 4) */}
+            {/* Floating Live Viva Prompt Box bottom right */}
             <div
               style={{
                 position: 'absolute',
@@ -577,7 +693,7 @@ class LRUCache:
                 background: 'rgba(16, 22, 38, 0.95)',
                 border: '1px solid rgba(168, 85, 247, 0.4)',
                 borderRadius: 'var(--radius-md)',
-                padding: '8px 12px',
+                padding: '8px 14px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
@@ -587,11 +703,14 @@ class LRUCache:
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#cbd5e1' }}>
                 <Sparkles size={15} color="#a855f7" />
-                <span>Ready for live viva: Mentos is analyzing your eviction pointer logic.</span>
+                <span>Ready for live viva: Mentos is analyzing your algorithmic logic.</span>
               </div>
 
               <button
-                onClick={onOpenVoiceTutor}
+                onClick={() => {
+                  if (onStartViva) onStartViva();
+                  else if (onOpenVoiceTutor) onOpenVoiceTutor();
+                }}
                 className="btn btn-primary"
                 style={{ fontSize: '0.6875rem', padding: '5px 12px', gap: '4px' }}
               >
@@ -604,3 +723,5 @@ class LRUCache:
     </div>
   );
 };
+
+export default CodingWorkspace;

@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api';
 
+import { mockData } from '../../data/mockData';
+
 export const MentosChatDashboard = ({
   onNavigate,
   onOpenVoiceTutor,
@@ -29,15 +31,16 @@ export const MentosChatDashboard = ({
   const [loading, setLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState('Mentos Adaptive Core v2.4 (Gemini 2.5 Flash)');
   const [copiedIndex, setCopiedIndex] = useState(null);
+  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [showHistoryDropdown, setShowHistoryDropdown] = useState(false);
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
-  const quickActionChips = [
-    { label: 'Explain a Concept', prompt: 'Can you explain how Hash Map Collision Handling & Open Addressing works with an intuitive mental model?' },
-    { label: 'Help Me Debug Code', prompt: 'Help me debug my LRU Cache eviction pointer logic. I am encountering edge-case off-by-one errors when capacity is reached.' },
-    { label: 'Create a Study Plan', prompt: 'Create an adaptive study plan for me to master Trees, Graphs, and Topological Sort based on my current 74% mastery score.' }
-  ];
+  const quickActionChips = mockData.chat.suggestions.map(s => ({
+    label: s.label,
+    prompt: s.prompt
+  }));
 
   const featureCards = [
     {
@@ -62,6 +65,16 @@ export const MentosChatDashboard = ({
       onClick: () => onNavigate('dashboard')
     }
   ];
+
+  const handleSelectConversation = (conv) => {
+    setActiveConversationId(conv.id);
+    setMessages(conv.messages.map(m => ({
+      role: m.role,
+      content: m.content,
+      timestamp: new Date(m.createdAt || Date.now())
+    })));
+    setShowHistoryDropdown(false);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -208,11 +221,65 @@ export const MentosChatDashboard = ({
             <span>{selectedModel}</span>
           </div>
 
-          {selectedCourse && (
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Context: <strong style={{ color: '#fff' }}>{selectedCourse.title}</strong>
-            </span>
-          )}
+          {/* Conversation History Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowHistoryDropdown(prev => !prev)}
+              className="btn btn-secondary"
+              style={{ fontSize: '0.75rem', padding: '5px 12px', gap: '6px' }}
+            >
+              <span>{activeConversationId ? mockData.chat.conversations.find(c => c.id === activeConversationId)?.title : 'Past Chats'}</span>
+              <span style={{ fontSize: '0.625rem', color: '#c4b5fd' }}>▾</span>
+            </button>
+
+            {showHistoryDropdown && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  marginTop: '6px',
+                  background: 'rgba(16, 22, 38, 0.98)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '6px',
+                  width: '260px',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.5)',
+                  zIndex: 50,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px'
+                }}
+              >
+                <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, padding: '4px 8px' }}>
+                  SAVED CONVERSATIONS
+                </div>
+                {mockData.chat.conversations.map((c) => (
+                  <div
+                    key={c.id}
+                    onClick={() => handleSelectConversation(c)}
+                    style={{
+                      padding: '8px 10px',
+                      borderRadius: 'var(--radius-sm)',
+                      background: activeConversationId === c.id ? 'rgba(168, 85, 247, 0.15)' : 'transparent',
+                      color: activeConversationId === c.id ? '#c4b5fd' : '#cbd5e1',
+                      fontSize: '0.75rem',
+                      fontWeight: activeConversationId === c.id ? 600 : 500,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = activeConversationId === c.id ? 'rgba(168, 85, 247, 0.15)' : 'transparent')}
+                  >
+                    <span>{c.title}</span>
+                    {c.pinned && <span style={{ fontSize: '0.625rem', color: '#a855f7' }}>📌</span>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
