@@ -1,5 +1,5 @@
-import React from 'react';
-import { ExternalLink, CheckCircle2, AlertCircle, RefreshCw, Layers, ShieldCheck, Sparkles, Mic } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Mic, Layers, ChevronDown, Sparkles } from 'lucide-react';
 
 export const Topbar = ({
   health,
@@ -11,127 +11,155 @@ export const Topbar = ({
   onRefresh,
   onOpenVoiceTutor
 }) => {
-  const isHealthy = health && health.status === 'healthy';
-  const isDegraded = health && health.status === 'degraded';
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const tabLabels = {
-    'dashboard': 'Overview',
-    'courses': 'Course Explorer',
-    'concept-map': 'Concept Map DAG',
-    'adaptive-path': 'Adaptive Learning Path',
-    'assessments': 'Assessments & Quizzes',
-    'coding-workspace': 'Coding Challenges',
-    'analytics': 'Analytics & Mastery',
-    'trainer-workspace': 'Curriculum Manager',
-    'evaluator-workspace': 'Submission Review Queue'
+  const getBreadcrumbs = () => {
+    switch (activeTab) {
+      case 'chat':
+        return { root: 'Mentos AI', current: 'AI Chat Companion' };
+      case 'dashboard':
+        return { root: 'Mentos AI', current: 'Learning Workspace' };
+      case 'concept-map':
+        return {
+          root: 'Concept Maps',
+          sub: 'Computer Science',
+          current: selectedCourse ? selectedCourse.title : 'Data Structures & Algorithms'
+        };
+      case 'coding-workspace':
+        return { root: 'Workspace', current: 'Coding Practice (LRU Cache)' };
+      case 'assessments':
+        return { root: 'Practice', current: 'Assessments & Quizzes' };
+      case 'viva':
+        return { root: 'AI Mentorship', current: 'Interactive AI Code Viva' };
+      case 'analytics':
+        return { root: 'Insights', current: 'Cognitive Mastery Analytics' };
+      case 'courses':
+        return { root: 'Curriculum', current: 'Learning Library' };
+      default:
+        return { root: 'Mentos AI', current: 'Learning Workspace' };
+    }
   };
+
+  const breadcrumbs = getBreadcrumbs();
+  const isHealthy = health && health.status === 'healthy';
 
   return (
     <header
       style={{
-        height: '60px',
+        height: '62px',
         padding: '0 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         background: 'var(--bg-topbar)',
-        backdropFilter: 'blur(12px)',
+        backdropFilter: 'blur(16px)',
         borderBottom: '1px solid var(--border-subtle)',
         position: 'sticky',
         top: 0,
-        zIndex: 15
+        zIndex: 15,
+        userSelect: 'none',
+        flexShrink: 0
       }}
     >
-      {/* Left: Breadcrumbs & Course Context */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8125rem' }}>
-        <span style={{ color: 'var(--text-muted)' }}>AdaptIQ</span>
-        <span style={{ color: 'var(--text-disabled)' }}>/</span>
-        <span style={{ color: '#fff', fontWeight: 600 }}>{tabLabels[activeTab] || 'Workspace'}</span>
+      {/* 1. Left: Breadcrumbs & Core Version Pill */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.8125rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: 'var(--text-muted)' }}>{breadcrumbs.root}</span>
+          <span style={{ color: 'var(--text-disabled)' }}>›</span>
+          {breadcrumbs.sub && (
+            <>
+              <span style={{ color: 'var(--text-muted)' }}>{breadcrumbs.sub}</span>
+              <span style={{ color: 'var(--text-disabled)' }}>›</span>
+            </>
+          )}
+          <span style={{ color: '#ffffff', fontWeight: 600 }}>{breadcrumbs.current}</span>
+        </div>
 
-        {selectedCourse && (
-          <>
-            <span style={{ color: 'var(--text-disabled)' }}>/</span>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '3px 8px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'rgba(99, 102, 241, 0.15)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                color: '#c7d2fe',
-                fontWeight: 600
-              }}
-            >
-              <Layers size={13} />
-              <span>{selectedCourse.title}</span>
-              <button
-                onClick={onClearSelectedCourse}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#a5b4fc',
-                  cursor: 'pointer',
-                  marginLeft: '4px',
-                  fontSize: '0.9rem',
-                  lineHeight: 1
-                }}
-                title="Deselect course"
-              >
-                ×
-              </button>
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Right: Health & Role controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {/* Live Backend Connection Pill */}
+        {/* Adaptive Core Version Pill */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '4px 10px',
+            padding: '3px 10px',
             borderRadius: 'var(--radius-full)',
-            background: isHealthy
-              ? 'rgba(16, 185, 129, 0.08)'
-              : isDegraded
-              ? 'rgba(245, 158, 11, 0.08)'
-              : 'rgba(239, 68, 68, 0.08)',
-            border: `1px solid ${
-              isHealthy
-                ? 'rgba(16, 185, 129, 0.25)'
-                : isDegraded
-                ? 'rgba(245, 158, 11, 0.25)'
-                : 'rgba(239, 68, 68, 0.25)'
-            }`,
-            fontSize: '0.75rem'
+            background: 'rgba(139, 92, 246, 0.1)',
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            fontSize: '0.6875rem',
+            fontWeight: 600,
+            color: '#c4b5fd',
+            cursor: 'pointer'
           }}
-          title={health?.database?.message || 'FastAPI + MongoDB Atlas Health Status'}
+          title="Engine: Dynamic Cognitive Weighting"
         >
           <span
             style={{
-              width: '7px',
-              height: '7px',
+              width: '6px',
+              height: '6px',
               borderRadius: '50%',
-              background: isHealthy ? '#10b981' : isDegraded ? '#f59e0b' : '#ef4444',
-              boxShadow: isHealthy ? '0 0 6px #10b981' : 'none'
+              background: '#a855f7',
+              boxShadow: '0 0 6px #a855f7'
             }}
           />
-          <span style={{ color: isHealthy ? '#34d399' : isDegraded ? '#fbbf24' : '#f87171', fontWeight: 600 }}>
-            {isHealthy ? 'Atlas Live' : isDegraded ? 'FastAPI Up (Atlas Standby)' : 'API Disconnected'}
+          <span>Mentos Adaptive Core v2.4</span>
+          <ChevronDown size={11} />
+        </div>
+      </div>
+
+      {/* 2. Center/Right: Search, Voice Tutor, Health & Profile */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        {/* Search Input Bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-full)',
+            padding: '6px 14px',
+            width: '280px',
+            transition: 'all 0.15s ease'
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.4)';
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+          }}
+        >
+          <Search size={14} color="var(--text-muted)" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search topics, syntax, lessons..."
+            style={{
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              color: '#ffffff',
+              fontSize: '0.75rem',
+              width: '100%'
+            }}
+          />
+          <span
+            style={{
+              fontSize: '0.625rem',
+              color: 'var(--text-muted)',
+              background: 'rgba(255, 255, 255, 0.06)',
+              padding: '1px 5px',
+              borderRadius: '3px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            ⌘K
           </span>
-          {health?.database?.latency_ms !== undefined && (
-            <span style={{ color: 'var(--text-muted)', borderLeft: '1px solid var(--border-subtle)', paddingLeft: '6px' }}>
-              {health.database.latency_ms}ms
-            </span>
-          )}
         </div>
 
-        {/* Voice Tutor Launch Button */}
+        {/* Voice Tutor Button */}
         {onOpenVoiceTutor && (
           <button
             onClick={onOpenVoiceTutor}
@@ -139,82 +167,65 @@ export const Topbar = ({
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '4px 10px',
+              padding: '6px 14px',
               borderRadius: 'var(--radius-full)',
-              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(6, 182, 212, 0.22))',
-              border: '1px solid rgba(99, 102, 241, 0.45)',
-              color: '#c7d2fe',
+              background: 'rgba(139, 92, 246, 0.12)',
+              border: '1px solid rgba(139, 92, 246, 0.35)',
+              color: '#c4b5fd',
               fontSize: '0.75rem',
               fontWeight: 600,
               cursor: 'pointer',
-              transition: 'all 0.15s ease'
+              transition: 'all 0.15s ease',
+              boxShadow: '0 0 12px rgba(139, 92, 246, 0.2)'
             }}
-            title="Talk with AdaptIQ Gemini Live Voice Tutor"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(139, 92, 246, 0.22)';
+              e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.55)';
+              e.currentTarget.style.boxShadow = '0 0 16px rgba(168, 85, 247, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(139, 92, 246, 0.12)';
+              e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.35)';
+              e.currentTarget.style.boxShadow = '0 0 12px rgba(139, 92, 246, 0.2)';
+            }}
           >
-            <Mic size={12} style={{ color: '#38bdf8' }} />
+            <Mic size={14} color="#a855f7" />
             <span>Voice Tutor</span>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#38bdf8', boxShadow: '0 0 6px #38bdf8' }} />
           </button>
         )}
 
-        {/* Swagger Docs Link */}
-        <a
-          href="http://localhost:8000/docs"
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn-ghost"
-          style={{ padding: '5px 8px', fontSize: '0.75rem', gap: '4px' }}
-          title="Open FastAPI Swagger Documentation"
-        >
-          <span>Swagger</span>
-          <ExternalLink size={12} />
-        </a>
-
-        {/* Role Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-surface)', padding: '3px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-          {['student', 'trainer', 'evaluator', 'admin'].map((r) => {
-            const isCurrent = currentRole === r;
-            return (
-              <button
-                key={r}
-                onClick={() => onRoleChange(r)}
-                style={{
-                  border: 'none',
-                  background: isCurrent ? 'var(--accent-primary)' : 'transparent',
-                  color: isCurrent ? '#fff' : 'var(--text-secondary)',
-                  padding: '3px 8px',
-                  borderRadius: 'var(--radius-xs)',
-                  fontSize: '0.6875rem',
-                  fontWeight: isCurrent ? 600 : 500,
-                  textTransform: 'capitalize',
-                  cursor: 'pointer',
-                  transition: 'all 0.12s ease'
-                }}
-              >
-                {r}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* User Avatar */}
-        <div
-          style={{
-            width: '28px',
-            height: '28px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #4f46e5, #06b6d4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            color: '#fff',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.3)'
-          }}
-          title={`Logged in as ${currentRole}`}
-        >
-          {currentRole.charAt(0).toUpperCase()}
+        {/* User Avatar with Status indicator */}
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              cursor: 'pointer',
+              border: '2px solid rgba(255, 255, 255, 0.1)'
+            }}
+          >
+            AC
+          </div>
+          <span
+            style={{
+              position: 'absolute',
+              bottom: '0',
+              right: '0',
+              width: '9px',
+              height: '9px',
+              borderRadius: '50%',
+              background: '#10b981',
+              border: '2px solid #090d16'
+            }}
+          />
         </div>
       </div>
     </header>

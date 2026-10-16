@@ -6,7 +6,7 @@ from app.config import get_settings
 from app.database import close_mongo_connection, connect_to_mongo, mongo_manager
 from app.repositories.concept_repository import ConceptRepository
 from app.repositories.course_repository import CourseRepository
-from app.routers import auth, concepts, courses, health, voice
+from app.routers import auth, concepts, courses, health, voice, chat
 
 
 @asynccontextmanager
@@ -47,6 +47,7 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(courses.router, prefix="/api/v1")
 app.include_router(concepts.router, prefix="/api/v1")
 app.include_router(voice.router, prefix="/api/v1")
+app.include_router(chat.router, prefix="/api/v1")
 
 
 

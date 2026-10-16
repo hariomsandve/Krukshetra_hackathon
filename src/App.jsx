@@ -14,6 +14,7 @@ import { CodingWorkspace } from './components/coding/CodingWorkspace';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { VoiceFloatingButton } from './components/voice/VoiceFloatingButton';
 import { VoiceTutorModal } from './components/voice/VoiceTutorModal';
+import { MentosChatDashboard } from './components/chat/MentosChatDashboard';
 import { api, getStoredRole, setStoredRole } from './services/api';
 import { Plus, GitBranch, Layers, Sparkles } from 'lucide-react';
 
@@ -162,6 +163,7 @@ export function App() {
         role={currentRole}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
+        onOpenVoiceTutor={() => setShowVoiceTutor(true)}
       />
 
       {/* 2. Main Content Area */}
@@ -204,7 +206,16 @@ export function App() {
         )}
 
         {/* View Switcher Container */}
-        <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg-app)' }}>
+        <div style={{ flex: 1, overflowY: 'auto', background: 'var(--bg-app)', display: 'flex', flexDirection: 'column' }}>
+          {/* MENTOS AI CHAT DASHBOARD */}
+          {activeTab === 'chat' && (
+            <MentosChatDashboard
+              onNavigate={setActiveTab}
+              onOpenVoiceTutor={() => setShowVoiceTutor(true)}
+              selectedCourse={selectedCourse}
+            />
+          )}
+
           {/* OVERVIEW DASHBOARD */}
           {activeTab === 'dashboard' && (
             currentRole === 'trainer' ? (
@@ -224,6 +235,7 @@ export function App() {
                 onNavigate={setActiveTab}
                 courses={courses}
                 onSelectCourse={setSelectedCourse}
+                onOpenVoiceTutor={() => setShowVoiceTutor(true)}
               />
             )
           )}
@@ -290,6 +302,10 @@ export function App() {
                     onStartLearning={handleStartLearning}
                     onDeleteConcept={handleDeleteConcept}
                     canModify={currentRole === 'trainer' || currentRole === 'admin'}
+                    onAskMentos={(concept) => {
+                      setSelectedConcept(concept);
+                      setActiveTab('chat');
+                    }}
                   />
                 )}
               </div>
@@ -318,6 +334,16 @@ export function App() {
           {activeTab === 'coding-workspace' && (
             <CodingWorkspace
               onBack={() => setActiveTab('dashboard')}
+              onOpenVoiceTutor={() => setShowVoiceTutor(true)}
+            />
+          )}
+
+          {/* AI CODE VIVA */}
+          {activeTab === 'viva' && (
+            <MentosChatDashboard
+              onNavigate={setActiveTab}
+              onOpenVoiceTutor={() => setShowVoiceTutor(true)}
+              selectedCourse={selectedCourse}
             />
           )}
 

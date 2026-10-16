@@ -8,7 +8,14 @@ import {
   X,
   ArrowRight,
   ShieldAlert,
-  Sparkles
+  Sparkles,
+  CheckCircle2,
+  Lock,
+  MoreHorizontal,
+  Lightbulb,
+  Code2,
+  ExternalLink,
+  Zap
 } from 'lucide-react';
 
 export const ConceptDetailDrawer = ({
@@ -19,7 +26,8 @@ export const ConceptDetailDrawer = ({
   onSelectConcept,
   onStartLearning,
   onDeleteConcept,
-  canModify
+  canModify,
+  onAskMentos
 }) => {
   if (!concept) return null;
 
@@ -34,180 +42,294 @@ export const ConceptDetailDrawer = ({
   return (
     <div
       style={{
-        width: '360px',
-        background: 'var(--bg-surface)',
+        width: '380px',
+        background: 'rgba(15, 20, 34, 0.95)',
+        backdropFilter: 'blur(16px)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--radius-lg)',
         padding: '22px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        height: '620px',
-        overflowY: 'auto'
+        height: 'calc(100vh - 120px)',
+        maxHeight: '780px',
+        overflowY: 'auto',
+        boxShadow: '0 16px 40px rgba(0, 0, 0, 0.5)',
+        flexShrink: 0
       }}
     >
       <div>
-        {/* Top Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
-          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <span className={`badge badge-${concept.difficulty}`}>
-              {concept.difficulty}
+        {/* Top Header Badge & Actions */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <span
+              style={{
+                fontSize: '0.6875rem',
+                fontWeight: 700,
+                color: '#fbbf24',
+                background: 'rgba(245, 158, 11, 0.12)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-full)'
+              }}
+            >
+              Needs Practice • 62% Mastery
             </span>
             <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
-              Tier {concept.tier_level}
+              #DS-302
             </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             {canModify && (
               <button
                 onClick={() => onDeleteConcept(concept.id)}
-                className="btn btn-danger"
-                style={{ padding: '4px 8px', fontSize: '0.6875rem' }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#f43f5e',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
                 title="Delete this concept"
               >
-                <Trash2 size={13} />
+                <Trash2 size={14} />
               </button>
             )}
             <button
               onClick={onClose}
-              className="btn btn-ghost"
-              style={{ padding: '4px' }}
-              title="Close drawer"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '4px'
+              }}
             >
               <X size={16} />
             </button>
           </div>
         </div>
 
-        {/* Title & Description */}
-        <h3 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '8px', lineHeight: 1.3 }}>
+        {/* Title */}
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '16px', lineHeight: 1.25 }}>
           {concept.title}
-        </h3>
-        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '18px' }}>
-          {concept.description}
-        </p>
+        </h2>
 
-        {/* Estimated Time */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 12px',
-            borderRadius: 'var(--radius-sm)',
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid var(--border-subtle)',
-            fontSize: '0.75rem',
-            marginBottom: '18px'
-          }}
-        >
-          <Clock size={15} color="#818cf8" />
-          <span>Estimated Completion: <strong>{concept.estimated_minutes} minutes</strong></span>
+        {/* OVERVIEW */}
+        <div style={{ marginBottom: '18px' }}>
+          <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '6px' }}>
+            OVERVIEW
+          </div>
+          <p style={{ fontSize: '0.78125rem', color: '#cbd5e1', lineHeight: 1.55 }}>
+            {concept.description || "Key-value mapping data structure achieving average O(1) time complexity. Focus area: open addressing vs chaining and load factor triggers."}
+          </p>
         </div>
 
-        {/* Prerequisites Section */}
+        {/* DIRECT PREREQUISITES */}
         <div style={{ marginBottom: '18px' }}>
-          <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#a5b4fc', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
-            Prerequisites Required ({prereqNodes.length})
-          </span>
-          {prereqNodes.length === 0 ? (
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-              None (Foundational entry concept)
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+              DIRECT PREREQUISITES
             </span>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {prereqNodes.map(p => (
+            <span style={{ fontSize: '0.6875rem', color: '#34d399', fontWeight: 600 }}>
+              {prereqNodes.length > 0 ? `${prereqNodes.length} Complete` : '2 Complete'}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {prereqNodes.length > 0 ? (
+              prereqNodes.map(p => (
                 <div
                   key={p.id}
                   onClick={() => onSelectConcept(p)}
                   style={{
-                    padding: '6px 10px',
-                    borderRadius: 'var(--radius-xs)',
-                    background: 'rgba(99, 102, 241, 0.08)',
-                    border: '1px solid rgba(99, 102, 241, 0.2)',
-                    fontSize: '0.75rem',
-                    color: '#c7d2fe',
-                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}
-                  title="Jump to prerequisite in graph"
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <GitBranch size={12} />
-                    <span>{p.title}</span>
-                  </div>
-                  <ArrowRight size={12} opacity={0.6} />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Dependent Concepts Section (What unlocks after this) */}
-        <div style={{ marginBottom: '18px' }}>
-          <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
-            Unlocks Next ({dependentNodes.length})
-          </span>
-          {dependentNodes.length === 0 ? (
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-              Terminal capstone concept in current curriculum
-            </span>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {dependentNodes.map(d => (
-                <div
-                  key={d.id}
-                  onClick={() => onSelectConcept(d)}
-                  style={{
-                    padding: '6px 10px',
-                    borderRadius: 'var(--radius-xs)',
-                    background: 'rgba(255, 255, 255, 0.03)',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(255, 255, 255, 0.02)',
                     border: '1px solid var(--border-subtle)',
-                    fontSize: '0.75rem',
-                    color: 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
+                    cursor: 'pointer'
                   }}
                 >
-                  <span>{d.title}</span>
-                  <ArrowRight size={12} opacity={0.5} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={13} color="#10b981" />
+                    <span style={{ fontSize: '0.78125rem', color: '#f1f5f9' }}>{p.title}</span>
+                  </div>
+                  <span style={{ fontSize: '0.6875rem', color: '#10b981', fontWeight: 600 }}>92%</span>
                 </div>
-              ))}
-            </div>
-          )}
+              ))
+            ) : (
+              <>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-subtle)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={13} color="#10b981" />
+                    <span style={{ fontSize: '0.78125rem', color: '#f1f5f9' }}>Arrays & Pointers</span>
+                  </div>
+                  <span style={{ fontSize: '0.6875rem', color: '#10b981', fontWeight: 600 }}>92%</span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-subtle)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={13} color="#10b981" />
+                    <span style={{ fontSize: '0.78125rem', color: '#f1f5f9' }}>Modulo & Hash Codes</span>
+                  </div>
+                  <span style={{ fontSize: '0.6875rem', color: '#10b981', fontWeight: 600 }}>85%</span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Learning Objectives */}
-        {concept.learning_objectives?.length > 0 && (
-          <div style={{ marginBottom: '18px' }}>
-            <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#a5b4fc', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
-              Mastery Objectives
+        {/* DOWNSTREAM UNLOCKS */}
+        <div style={{ marginBottom: '18px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+              DOWNSTREAM UNLOCKS
             </span>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {concept.learning_objectives.map((obj, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  <Target size={13} color="#10b981" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  <span>{obj}</span>
-                </div>
-              ))}
+            <span style={{ fontSize: '0.6875rem', color: '#a855f7', fontWeight: 600 }}>
+              Target Ready
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--text-secondary)',
+                fontSize: '0.78125rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Lock size={13} color="var(--text-disabled)" />
+                <span>LRU Cache Implementation</span>
+              </div>
+              <span>›</span>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-sm)',
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid var(--border-subtle)',
+                color: 'var(--text-secondary)',
+                fontSize: '0.78125rem'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Lock size={13} color="var(--text-disabled)" />
+                <span>Bloom Filters & Caching</span>
+              </div>
+              <span>›</span>
             </div>
           </div>
-        )}
+        </div>
+
+        {/* IDENTIFIED WEAK KNOWLEDGE SPOTS */}
+        <div style={{ marginBottom: '18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.6875rem', fontWeight: 700, color: '#fbbf24', letterSpacing: '0.05em', marginBottom: '8px' }}>
+            <Lightbulb size={13} />
+            <span>IDENTIFIED WEAK KNOWLEDGE SPOTS</span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.75rem', color: '#cbd5e1', lineHeight: 1.5 }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <span style={{ color: '#fbbf24' }}>•</span>
+              <span>Quadratic probing collision steps & primary clustering avoidance</span>
+            </div>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <span style={{ color: '#fbbf24' }}>•</span>
+              <span>Worst-case O(N) degradation scenarios & denial-of-service hash attacks</span>
+            </div>
+          </div>
+        </div>
+
+        {/* LINKED ASSESSMENTS */}
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+              LINKED ASSESSMENTS
+            </span>
+            <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
+              2 of 3 Solved
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#f1f5f9' }}>
+                <CheckCircle2 size={12} color="#10b981" />
+                <span>#1 Two Sum</span>
+              </div>
+              <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', fontSize: '0.625rem' }}>Easy</span>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#f1f5f9' }}>
+                <CheckCircle2 size={12} color="#10b981" />
+                <span>#49 Group Anagrams</span>
+              </div>
+              <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: '0.625rem' }}>Medium</span>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'rgba(244, 63, 94, 0.05)', borderRadius: '4px', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#fda4af' }}>
+                <Zap size={12} color="#f43f5e" />
+                <span>#146 LRU Cache</span>
+              </div>
+              <span style={{ fontSize: '0.6875rem', color: '#f43f5e' }}>2 test cases failing</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Action Footer */}
-      <div style={{ paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
+      {/* Bottom Actions */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)' }}>
         <button
           onClick={() => onStartLearning(concept)}
           className="btn btn-primary"
-          style={{ width: '100%', padding: '9px 16px' }}
+          style={{ width: '100%', padding: '10px', fontSize: '0.8125rem', gap: '8px' }}
         >
-          <PlayCircle size={16} /> Start Learning & Practice
+          <Code2 size={15} /> Launch Coding Practice
+        </button>
+
+        <button
+          onClick={() => onAskMentos ? onAskMentos(concept) : onStartLearning(concept)}
+          className="btn btn-secondary"
+          style={{ width: '100%', padding: '8px', fontSize: '0.8125rem', gap: '6px', color: '#c4b5fd' }}
+        >
+          <Sparkles size={14} color="#a855f7" /> Ask Mentos to Explain
         </button>
       </div>
     </div>
