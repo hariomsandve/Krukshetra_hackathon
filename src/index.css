@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
+    color: #1a1a1a;
+    background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Custom subtle scrollbar matching Claude desktop UI */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Dedicated Print Media Query for Clean Artifact Document Output */
+@media print {
+  @page {
+    margin: 1.6cm 1.4cm;
+    size: auto;
+  }
+
+  html, body, #root {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  /* Hide all application window chrome, sidebars, conversation pane, dividers, modals and floating toolbars */
+  header,
+  aside,
+  .print-hidden,
+  .chat-pane,
+  .drag-divider,
+  .artifact-header,
+  .artifact-toolbar,
+  .modal-backdrop,
+  .toast-notification,
+  button:not(.print-allow) {
+    display: none !important;
+  }
+
+  /* Display print-specific document header */
+  .print-header {
+    display: block !important;
+  }
+
+  /* Expand artifact container into clean standard document */
+  .artifact-panel {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .artifact-scroll-container {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .printable-document {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Clean print table formatting */
+  .printable-document table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 1.25rem 0 !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .printable-document table td,
+  .printable-document table th {
+    border: 1px solid #d1d5db !important;
+    padding: 8px 12px !important;
+    font-size: 10.5pt !important;
+    color: #111827 !important;
+  }
+
+  .printable-document h2 {
+    font-size: 18pt !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    margin-top: 1.5rem !important;
+  }
+
+  .printable-document p,
+  .printable-document li {
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+    color: #1f2937 !important;
+  }
+
+  .printable-document li {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 0.6rem !important;
+  }
+
+  /* Remove screen-only visual elements like the horizontal pill indicator */
+  .screen-only {
+    display: none !important;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Claude Artifacts Workspace - MentOS",
+  "description": "Pixel-perfect desktop split-view interface replica featuring conversation timeline, memory indicator, and interactive Marathi architecture artifact panel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
