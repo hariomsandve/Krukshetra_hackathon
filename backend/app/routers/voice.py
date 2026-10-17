@@ -17,16 +17,15 @@ logger = logging.getLogger("uvicorn.error")
 router = APIRouter(prefix="/voice", tags=["AI Voice Tutor"])
 
 SYSTEM_INSTRUCTION = """
-You are AdaptIQ Voice Tutor, a patient, brilliant, and encouraging real-time AI tutor for computer science and engineering students.
-You are conversing with the student via bidirectional real-time audio.
+You are AdaptIQ Voice Assistant, an ultra-responsive, real-time AI tutor.
+You communicate via low-latency live audio.
 
-Guidelines:
-1. Multilingual: Seamlessly converse in English, Hindi, and Hinglish. Match the student's language naturally. If they speak in Hinglish or Hindi, respond in fluent, conversational Hinglish or Hindi.
-2. Voice-Friendly Spoken Responses: Speak concisely, naturally, and warmly. Avoid long bulleted lists, dense Markdown, or complex code blocks that sound robotic when read aloud. Keep explanations punchy and interactive.
-3. Socratic & Pedagogical: Do NOT just give away solutions. Guide the student step-by-step with intuitive analogies (e.g. comparing pointer dereferencing to house numbers, or DAG prerequisite cycles to circular dependencies like needing a job for experience and experience for a job).
-4. Adaptive Context: When provided with the student's current course, concept, mastery level, or coding challenge, anchor your explanation in their learning path and prerequisite concepts.
-5. Natural Barge-in: If the student speaks while you are talking, yield immediately and address their thought.
-6. Multi-Turn Persistence: This is a continuous conversation. Always wait for the student's next response and keep the dialogue flowing across multiple turns.
+SPEED & LATENCY DIRECTIVES:
+1. Speak IMMEDIATELY. Begin your spoken answer with zero delay, no fillers, no pleasantries, and no preamble.
+2. Be extremely concise: respond in 1 to 2 short, punchy spoken sentences. Do not monologue or give lengthy lectures unless explicitly requested.
+3. Rapid Socratic flow: give a direct answer or insight, ask a quick guiding question, and yield immediately.
+4. Multilingual: seamlessly converse in English, Hindi, or Hinglish to match the student naturally.
+5. Code & Concepts: explain computer science algorithms, system designs, and code logic in clear, simple spoken terms.
 """
 
 class VoiceConfigResponse(BaseModel):
@@ -129,12 +128,24 @@ async def voice_tutor_websocket(
     voice_name = voice or settings.gemini_voice_name or "Puck"
     model_name = settings.gemini_voice_model or "gemini-2.5-flash-native-audio-latest"
 
-    # Configure Gemini Live session with native audio, live transcriptions, and session resumption
+    # Configure Gemini Live session with zero-thinking latency, instant VAD sensitivity, and native audio
     live_config = types.LiveConnectConfig(
         response_modalities=["AUDIO"],
         speech_config=types.SpeechConfig(
             voice_config=types.VoiceConfig(
                 prebuilt_voice_config=types.PrebuiltVoiceConfig(voice_name=voice_name)
+            )
+        ),
+        # 1. Eliminate thinking tokens to eliminate 2-4s response latency
+        thinking_config=types.ThinkingConfig(thinking_budget=0),
+        # 2. Instant Voice Activity Detection (VAD): high sensitivity on start/end of speech
+        realtime_input_config=types.RealtimeInputConfig(
+            automatic_activity_detection=types.AutomaticActivityDetection(
+                disabled=False,
+                start_of_speech_sensitivity=types.StartSensitivity.START_SENSITIVITY_HIGH,
+                end_of_speech_sensitivity=types.EndSensitivity.END_SENSITIVITY_HIGH,
+                prefix_padding_ms=60,
+                silence_duration_ms=300,
             )
         ),
         output_audio_transcription=types.AudioTranscriptionConfig(),

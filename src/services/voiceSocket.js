@@ -153,9 +153,11 @@ export class VoiceClient {
         this.micStream = await navigator.mediaDevices.getUserMedia({
           audio: {
             channelCount: 1,
+            sampleRate: 16000,
             echoCancellation: true,
             noiseSuppression: true,
-            autoGainControl: true
+            autoGainControl: true,
+            latency: 0
           }
         });
 
@@ -164,8 +166,8 @@ export class VoiceClient {
         this.micAnalyser.fftSize = 256;
         this.micSource.connect(this.micAnalyser);
 
-        // Continuous streaming buffer: 4096 frames
-        const bufferSize = 4096;
+        // Low-latency streaming buffer: 2048 frames (~42ms)
+        const bufferSize = 2048;
         this.micProcessor = this.audioCtx.createScriptProcessor(bufferSize, 1, 1);
         this.micSource.connect(this.micProcessor);
         this.micProcessor.connect(this.audioCtx.destination);
@@ -181,12 +183,9 @@ export class VoiceClient {
           const inputChannelData = e.inputBuffer.getChannelData(0);
           const downsampled = downsampleBuffer(inputChannelData, actualSampleRate, 16000);
           const pcm16 = floatTo16BitPCM(downsampled);
-          const base64Audio = base64EncodeAudio(pcm16);
 
-          this.ws.send(JSON.stringify({
-            type: 'audio',
-            data: base64Audio
-          }));
+          // Direct binary PCM 16kHz audio streaming: zero JSON/base64 serialization overhead
+          this.ws.send(pcm16.buffer);
         };
       }
 
@@ -320,7 +319,7 @@ export class VoiceClient {
 
       const currentTime = this.playbackCtx.currentTime;
       if (this.nextPlayTime < currentTime) {
-        this.nextPlayTime = currentTime + 0.035; // 35ms safety lookahead buffer
+        this.nextPlayTime = currentTime + 0.01; // Instant 10ms safety lookahead buffer
       }
 
       sourceNode.start(this.nextPlayTime);
