@@ -84,6 +84,7 @@ import {
   formatActivityTime,
   purgeLegacyStorage,
 } from './services/historyService';
+import SplashScreen from './components/SplashScreen';
 
 interface ArtifactStep {
   stepNumber: number;
@@ -246,72 +247,6 @@ function InteractiveChart({ chart }: { chart: any }) {
             </div>
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function SplashScreen({ onFinish }: { onFinish: () => void }) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setTimeout(onFinish, 300);
-          return 100;
-        }
-        return prev + 5;
-      });
-    }, 40);
-    return () => clearInterval(timer);
-  }, [onFinish]);
-
-  return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 animate-in fade-in duration-300 select-none">
-      <style>{`
-        @keyframes waterFlow {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .water-3d-text {
-          background: linear-gradient(270deg, #2563eb, #10b981, #f59e0b, #ef4444, #2563eb);
-          background-size: 300% 300%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          animation: waterFlow 3.5s ease infinite;
-          filter: drop-shadow(0 12px 25px rgba(37, 99, 235, 0.25));
-        }
-      `}</style>
-
-      <div className="text-center space-y-6 max-w-lg w-full">
-        {/* Plain Background with 3D Volumetric Water-Flow MENToS Title */}
-        <div className="py-4">
-          <h1 className="text-7xl sm:text-9xl font-black tracking-tight font-sans water-3d-text">
-            MentOS
-          </h1>
-        </div>
-
-        {/* Quote */}
-        <p className="text-xs sm:text-sm font-medium text-neutral-600 max-w-xs mx-auto leading-relaxed pt-2">
-          Your personalized mentor for academics and future success.
-        </p>
-
-        {/* Loading Bar */}
-        <div className="space-y-2 pt-2 max-w-xs mx-auto w-full">
-          <div className="w-full h-1.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/60 shadow-inner">
-            <div
-              className="h-full bg-gradient-to-r from-blue-500 via-emerald-500 via-yellow-500 to-rose-500 transition-all duration-75 rounded-full"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <div className="text-[10px] font-mono font-semibold text-neutral-400">
-            Loading workspace... {progress}%
-          </div>
-        </div>
       </div>
     </div>
   );

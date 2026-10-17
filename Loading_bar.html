@@ -1,0 +1,563 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>MentOS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Poppins:wght@400;500&family=IBM+Plex+Mono:wght@400&family=Montserrat:wght@800&display=swap">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #1c2733;
+    --ink-soft: #566472;
+    --glass-line: rgba(96, 134, 166, 0.55);
+    --font-display: 'Montserrat', 'Arial Black', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+
+  html, body { height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0;
+    overflow-x: hidden;
+  }
+
+  .screen {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2vh, 22px);
+    padding-block: 24px;
+  }
+
+  .sr {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  .stage { width: 100%; max-width: 1700px; }
+  #mark { display: block; width: 100%; max-width: 100%; }
+
+  .quote {
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+    font-family: 'Poppins', var(--font-body);
+    font-size: clamp(11px, 2.1vw, 22px);
+    line-height: 1.45;
+    letter-spacing: 0.01em;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .loader {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: clamp(4px, 2vh, 18px);
+  }
+
+  .bar {
+    position: relative;
+    width: clamp(220px, 36vw, 460px);
+    height: 18px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #eef3f7, #f8fbfd);
+    box-shadow:
+      0 0 0 1px var(--glass-line),
+      inset 0 2px 3px rgba(40, 70, 100, 0.22),
+      0 8px 16px rgba(40, 90, 140, 0.14);
+  }
+  .bar-fill {
+    position: absolute;
+    inset: 3px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #3a3a3a 0%, #000 50%, #141414 100%);
+    clip-path: inset(0 calc(100% - var(--p, 0%)) 0 0 round 999px);
+  }
+  .bar-gloss {
+    position: absolute;
+    inset: 3px;
+    border-radius: 999px;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.1) 45%,
+      rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, 0.18) 100%);
+  }
+
+  .pct {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+</style>
+
+<main class="screen">
+  <h1 class="sr">MentOS</h1>
+  <div class="stage" id="stage">
+    <canvas id="mark" aria-hidden="true"></canvas>
+  </div>
+  <p class="quote">Your personalized mentor for academics and future success.</p>
+  <div class="loader">
+    <div class="bar" id="bar" role="progressbar" aria-label="Loading workspace" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="bar-fill"></div>
+      <div class="bar-gloss"></div>
+    </div>
+    <p class="pct" id="pct">Loading workspace... 0%</p>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var stage = document.getElementById('stage');
+  var cv = document.getElementById('mark');
+  var ctx = cv.getContext('2d');
+  var bar = document.getElementById('bar');
+  var pctEl = document.getElementById('pct');
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  var TEXT = 'MentOS';
+  var FONT_FAMILY = "Montserrat, 'Arial Black', 'Helvetica Neue', Arial, sans-serif";
+  var TAU = Math.PI * 2;
+
+  // Vivid, saturated stops: blue, green, red, yellow across the word.
+  var STOPS = [
+    [0, '#0a5cff'], [0.13, '#1fa2ff'], [0.27, '#00c853'], [0.38, '#7be000'], [0.5, '#ff1f2b'],
+    [0.6, '#ffd400'], [0.72, '#ff1f2b'], [0.82, '#00c853'], [0.92, '#ffd400'], [1, '#ffb300']
+  ];
+  var BLOBS = [
+    [0.07, '#0a5cff'], [0.2, '#1fa2ff'], [0.31, '#00c853'], [0.49, '#ff1f2b'],
+    [0.62, '#ffd400'], [0.74, '#ff1f2b'], [0.84, '#00c853'], [0.94, '#ffd400']
+  ];
+
+  var rgbCache = {};
+  function rgba(hex, a) {
+    var c = rgbCache[hex];
+    if (!c) {
+      var n = parseInt(hex.slice(1), 16);
+      c = rgbCache[hex] = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    }
+    return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')';
+  }
+
+  var cssW = 0, cssH = 0, pw = 0, ph = 0, dpr = 1;
+  var fs = 100, wordW = 0, asc = 0, desc = 0;
+  var left = 0, right = 0, top = 0, bot = 0, baseline = 0;
+  var gap = 0, reflH = 0;
+  var baseY = 0, amp = 0, tilt = 0;
+  var M, S, R, L, F;
+  var bubbles = [];
+
+  function mk() {
+    var c = document.createElement('canvas');
+    c.width = pw; c.height = ph;
+    var x = c.getContext('2d');
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { c: c, x: x };
+  }
+  function setFont(x) {
+    x.font = '800 ' + fs + 'px ' + FONT_FAMILY;
+    x.textAlign = 'center';
+    x.textBaseline = 'alphabetic';
+    x.lineJoin = 'round';
+    x.miterLimit = 2;
+  }
+  function fillWord(x, dx, dy) {
+    setFont(x);
+    x.fillText(TEXT, cssW / 2 + (dx || 0), baseline + (dy || 0));
+  }
+  function strokeWord(x) {
+    setFont(x);
+    x.strokeText(TEXT, cssW / 2, baseline);
+  }
+
+  function layout() {
+    var cw = Math.max(240, stage.clientWidth | 0);
+    var frac = cw < 640 ? 0.92 : 0.72;
+    var m = document.createElement('canvas').getContext('2d');
+    m.font = '800 100px ' + FONT_FAMILY;
+    var mt = m.measureText(TEXT);
+    var wRatio = mt.width / 100;
+    var aRatio = (mt.actualBoundingBoxAscent || 72) / 100;
+    var dRatio = (mt.actualBoundingBoxDescent || 2) / 100;
+
+    fs = Math.min(cw * frac / wRatio, window.innerHeight * 0.42);
+    var pad = fs * 0.2;
+    wordW = wRatio * fs; asc = aRatio * fs; desc = dRatio * fs;
+    cssW = cw;
+    top = pad; bot = pad + asc + desc; baseline = pad + asc;
+    gap = fs * 0.02;
+    reflH = (asc + desc) * 0.55;
+    cssH = Math.ceil(bot + gap + reflH + pad * 0.3);
+    left = (cw - wordW) / 2; right = left + wordW;
+
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = Math.min(dpr, Math.sqrt(3.6e6 / (cssW * cssH)));
+    dpr = Math.max(dpr, 0.75);
+    pw = Math.round(cssW * dpr); ph = Math.round(cssH * dpr);
+    cv.width = pw; cv.height = ph;
+    cv.style.height = cssH + 'px';
+
+    M = mk(); S = mk(); R = mk(); L = mk(); F = mk();
+    buildStatic();
+    initBubbles();
+  }
+
+  function buildStatic() {
+    var hgt = bot - top;
+
+    M.x.fillStyle = '#000';
+    fillWord(M.x);
+
+    // ground shadow and glass thickness, letter interior cut out
+    var s = S.x;
+    s.clearRect(0, 0, cssW, cssH);
+    s.save();
+    s.shadowColor = 'rgba(28,78,130,0.26)';
+    s.shadowBlur = fs * 0.14 * dpr;
+    s.shadowOffsetX = fs * 0.015 * dpr;
+    s.shadowOffsetY = fs * 0.07 * dpr;
+    s.fillStyle = '#000';
+    fillWord(s);
+    s.restore();
+    var N = Math.max(3, Math.round(fs * 0.03));
+    s.fillStyle = 'rgba(150,196,230,0.5)';
+    for (var i = N; i >= 1; i--) fillWord(s, i * 0.55, i * 0.85);
+    s.globalCompositeOperation = 'destination-out';
+    s.fillStyle = '#000';
+    fillWord(s);
+    s.globalCompositeOperation = 'source-over';
+
+    // glass rim, highlights, outline (drawn over the liquid so colour looks sealed inside glass)
+    var r = R.x;
+    r.clearRect(0, 0, cssW, cssH);
+    r.lineJoin = 'round';
+    r.strokeStyle = 'rgba(210,235,255,0.38)';
+    r.lineWidth = fs * 0.12;
+    strokeWord(r);
+
+    var g = r.createLinearGradient(0, top, 0, bot);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.5, 'rgba(215,236,250,0.55)');
+    g.addColorStop(1, 'rgba(255,255,255,0.85)');
+    r.strokeStyle = g;
+    r.lineWidth = fs * 0.05;
+    strokeWord(r);
+
+    // thin bright inner edge line
+    r.strokeStyle = 'rgba(255,255,255,0.9)';
+    r.lineWidth = Math.max(1.2, fs * 0.012);
+    strokeWord(r);
+
+    // big mirror gloss on upper half
+    var g3 = r.createLinearGradient(0, top, 0, top + hgt * 0.5);
+    g3.addColorStop(0, 'rgba(255,255,255,0.62)');
+    g3.addColorStop(0.7, 'rgba(255,255,255,0.12)');
+    g3.addColorStop(1, 'rgba(255,255,255,0)');
+    r.fillStyle = g3;
+    r.fillRect(left - 6, top - 6, wordW + 12, hgt * 0.5 + 6);
+
+    // soft bottom bounce light
+    var g4 = r.createLinearGradient(0, bot - hgt * 0.22, 0, bot);
+    g4.addColorStop(0, 'rgba(255,255,255,0)');
+    g4.addColorStop(1, 'rgba(255,255,255,0.35)');
+    r.fillStyle = g4;
+    r.fillRect(left - 6, bot - hgt * 0.22, wordW + 12, hgt * 0.22 + 6);
+
+    r.globalCompositeOperation = 'destination-in';
+    r.fillStyle = '#000';
+    fillWord(r);
+    r.globalCompositeOperation = 'source-over';
+
+    r.strokeStyle = 'rgba(40,96,150,0.7)';
+    r.lineWidth = Math.max(1, fs * 0.006);
+    strokeWord(r);
+  }
+
+  function newBubble(init) {
+    var rad = fs * (0.005 + Math.random() * Math.random() * 0.022);
+    return {
+      x: left + Math.random() * wordW,
+      y: init ? top + Math.random() * (bot - top) : bot + rad + Math.random() * fs * 0.1,
+      r: rad,
+      vy: fs * (0.05 + Math.random() * 0.11),
+      w: 0.6 + Math.random() * 1.2,
+      ph: Math.random() * TAU,
+      still: false
+    };
+  }
+  function initBubbles() {
+    bubbles = [];
+    var n = Math.round(Math.min(80, Math.max(26, wordW / 16)));
+    var i, b;
+    for (i = 0; i < n; i++) bubbles.push(newBubble(true));
+    for (i = 0; i < 14; i++) {
+      b = newBubble(true);
+      b.still = true;
+      b.y = top + (bot - top) * (0.05 + Math.random() * 0.8);
+      b.r = fs * (0.004 + Math.random() * 0.01);
+      bubbles.push(b);
+    }
+  }
+
+  // Liquid surface sits ABOVE the letter tops so colour reaches every edge.
+  function surfY(x, t, ph, off) {
+    var u = (x - cssW / 2) / wordW;
+    var k = TAU / (fs * 0.95);
+    return baseY + off + tilt * u * 2 +
+      amp * Math.sin(x * k + t * 1.55 + ph) +
+      amp * 0.55 * Math.sin(x * k * 2.2 - t * 1.05 + ph * 1.7);
+  }
+  function wavePath(c, t, ph, off, open) {
+    var x0 = left - fs * 0.1, x1 = right + fs * 0.1, step = Math.max(3, fs * 0.012), x;
+    c.beginPath();
+    c.moveTo(x0, surfY(x0, t, ph, off));
+    for (x = x0 + step; x <= x1; x += step) c.lineTo(x, surfY(x, t, ph, off));
+    c.lineTo(x1, surfY(x1, t, ph, off));
+    if (!open) {
+      c.lineTo(x1, cssH + 2);
+      c.lineTo(x0, cssH + 2);
+      c.closePath();
+    }
+  }
+
+  function paintColors(c, t, hgt) {
+    var i, x;
+    var g = c.createLinearGradient(
+      left - fs * 0.15 + Math.sin(t * 0.45) * fs * 0.12, 0,
+      right + fs * 0.15 + Math.cos(t * 0.4) * fs * 0.12, 0);
+    for (i = 0; i < STOPS.length; i++) {
+      var o = STOPS[i][0] + Math.sin(t * 0.6 + i * 1.7) * 0.022;
+      g.addColorStop(Math.min(1, Math.max(0, o)), STOPS[i][1]);
+    }
+    c.fillStyle = g;
+    c.fillRect(0, 0, cssW, cssH);
+
+    for (i = 0; i < BLOBS.length; i++) {
+      var b = BLOBS[i];
+      var cx = left + (b[0] + Math.sin(t * (0.35 + i * 0.07) + i * 2.1) * 0.07) * wordW;
+      var cy = top + hgt * (0.5 + 0.38 * Math.sin(t * (0.5 + i * 0.05) + i * 1.3));
+      var rad = hgt * 0.7;
+      var rg = c.createRadialGradient(cx, cy, 0, cx, cy, rad);
+      rg.addColorStop(0, rgba(b[1], 0.85));
+      rg.addColorStop(1, rgba(b[1], 0));
+      c.fillStyle = rg;
+      c.fillRect(cx - rad, cy - rad, rad * 2, rad * 2);
+    }
+
+    c.lineWidth = hgt * 0.02;
+    c.strokeStyle = 'rgba(255,255,255,0.26)';
+    c.lineCap = 'round';
+    for (i = 0; i < 3; i++) {
+      c.beginPath();
+      for (x = left; x <= right; x += 8) {
+        var y = top + hgt * (0.2 + 0.3 * i) +
+          Math.sin(x * TAU / (fs * 0.8) + t * (0.9 + i * 0.3) + i * 2) * hgt * 0.05;
+        if (x === left) c.moveTo(x, y); else c.lineTo(x, y);
+      }
+      c.stroke();
+    }
+  }
+
+  function drawBubbles(c, t, dt) {
+    var i, b, sy;
+    c.lineCap = 'round';
+    for (i = 0; i < bubbles.length; i++) {
+      b = bubbles[i];
+      if (!b.still && dt > 0) {
+        b.y -= b.vy * dt;
+        b.x += Math.sin(t * b.w + b.ph) * 0.18;
+        sy = top - fs * 0.02;
+        if (b.y < sy + b.r) bubbles[i] = b = newBubble(false);
+      }
+      var by = b.still ? b.y + Math.sin(t * 0.5 + b.ph) * 0.4 : b.y;
+      c.beginPath();
+      c.arc(b.x, by, b.r, 0, TAU);
+      c.fillStyle = 'rgba(255,255,255,0.16)';
+      c.fill();
+      c.lineWidth = Math.max(0.8, b.r * 0.16);
+      c.strokeStyle = 'rgba(255,255,255,0.85)';
+      c.stroke();
+      c.beginPath();
+      c.arc(b.x - b.r * 0.28, by - b.r * 0.28, b.r * 0.55, Math.PI * 1.05, Math.PI * 1.65);
+      c.lineWidth = Math.max(0.7, b.r * 0.14);
+      c.strokeStyle = 'rgba(255,255,255,1)';
+      c.stroke();
+    }
+  }
+
+  function draw(t, dt) {
+    var c = L.x, hgt = bot - top;
+    baseY = top - hgt * 0.12;      // surface above the letters = full edge-to-edge fill
+    amp = hgt * 0.03;
+    tilt = Math.sin(t * 0.9) * hgt * 0.03 + Math.sin(t * 0.37 + 1.3) * hgt * 0.02;
+
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.globalCompositeOperation = 'source-over';
+    c.globalAlpha = 1;
+    c.clearRect(0, 0, cssW, cssH);
+
+    // far layer for depth
+    c.save();
+    wavePath(c, t, 1.9, -hgt * 0.02, false);
+    c.clip();
+    c.globalAlpha = 0.55;
+    paintColors(c, t + 3.1, hgt);
+    c.restore();
+
+    // main liquid body, filling the whole letter
+    c.save();
+    wavePath(c, t, 0, 0, false);
+    c.clip();
+    paintColors(c, t, hgt);
+    var dg = c.createLinearGradient(0, top, 0, bot);
+    dg.addColorStop(0, 'rgba(255,255,255,0.22)');
+    dg.addColorStop(0.3, 'rgba(255,255,255,0)');
+    dg.addColorStop(1, 'rgba(0,20,60,0.14)');
+    c.fillStyle = dg;
+    c.fillRect(0, 0, cssW, cssH);
+    c.restore();
+
+    drawBubbles(c, t, dt);
+
+    // light sweeps: two glossy diagonal bands travelling across the glass
+    var k, p, sx, bw, sg;
+    for (k = 0; k < 2; k++) {
+      p = (((t * 0.085) + k * 0.55) % 1.6) - 0.3;
+      sx = left + p * wordW;
+      bw = fs * (k ? 0.12 : 0.26);
+      sg = c.createLinearGradient(sx - bw, top, sx + bw, bot);
+      sg.addColorStop(0, 'rgba(255,255,255,0)');
+      sg.addColorStop(0.5, 'rgba(255,255,255,' + (k ? 0.4 : 0.34) + ')');
+      sg.addColorStop(1, 'rgba(255,255,255,0)');
+      c.fillStyle = sg;
+      c.fillRect(left - fs * 0.1, top - 4, wordW + fs * 0.2, hgt + 8);
+    }
+
+    // keep only the letter shapes
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.globalCompositeOperation = 'destination-in';
+    c.drawImage(M.c, 0, 0);
+    c.restore();
+
+    // mirror reflection under the word
+    var f = F.x;
+    f.setTransform(1, 0, 0, 1, 0, 0);
+    f.globalCompositeOperation = 'source-over';
+    f.globalAlpha = 1;
+    f.clearRect(0, 0, pw, ph);
+    f.setTransform(dpr, 0, 0, -dpr, 0, (2 * bot + gap) * dpr);
+    f.globalAlpha = 0.38;
+    f.drawImage(L.c, 0, 0, cssW, cssH);
+    f.drawImage(R.c, 0, 0, cssW, cssH);
+    f.setTransform(1, 0, 0, 1, 0, 0);
+    f.globalAlpha = 1;
+    f.globalCompositeOperation = 'destination-out';
+    var fg = f.createLinearGradient(0, (bot + gap) * dpr, 0, (bot + gap + reflH) * dpr);
+    fg.addColorStop(0, 'rgba(0,0,0,0.15)');
+    fg.addColorStop(1, 'rgba(0,0,0,1)');
+    f.fillStyle = fg;
+    f.fillRect(0, 0, pw, ph);
+    f.globalCompositeOperation = 'source-over';
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, pw, ph);
+    ctx.drawImage(F.c, 0, 0);
+    ctx.drawImage(S.c, 0, 0);
+    try { ctx.filter = 'saturate(1.3) contrast(1.06)'; } catch (e) {}
+    ctx.drawImage(L.c, 0, 0);
+    try { ctx.filter = 'none'; } catch (e) {}
+    ctx.drawImage(R.c, 0, 0);
+  }
+
+  // progress bar
+  var prog = -1, manual = false;
+  function setProg(n) {
+    n = Math.max(0, Math.min(100, n));
+    var r = Math.round(n);
+    bar.style.setProperty('--p', n + '%');
+    if (r !== prog) {
+      prog = r;
+      pctEl.textContent = 'Loading workspace... ' + r + '%';
+      bar.setAttribute('aria-valuenow', String(r));
+    }
+  }
+  // Call window.setMentOSProgress(0..100) from the real app to drive the bar yourself.
+  window.setMentOSProgress = function (n) { manual = true; setProg(Number(n) || 0); };
+
+  var t0 = 0, last = 0, started = false;
+  function frame(now) {
+    var t = (now - t0) / 1000;
+    var dt = Math.min(0.05, Math.max(0, t - last));
+    last = t;
+    draw(t, dt);
+    if (!manual) {
+      var cyc = (now - t0) % 7200;
+      var f = Math.min(1, cyc / 5200);
+      var e = f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2;
+      setProg(e * 100);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  var lastW = 0, lastH = 0, queued = false;
+  function onResize() {
+    if (!started || queued) return;
+    queued = true;
+    requestAnimationFrame(function () {
+      queued = false;
+      var w = stage.clientWidth, h = window.innerHeight;
+      if (w === lastW && h === lastH) return;
+      lastW = w; lastH = h;
+      layout();
+      if (reduce) draw(2.3, 0);
+    });
+  }
+
+  function start() {
+    if (started) return;
+    started = true;
+    layout();
+    lastW = stage.clientWidth; lastH = window.innerHeight;
+    if (reduce) {
+      draw(2.3, 0);
+      setProg(100);
+    } else {
+      t0 = performance.now();
+      requestAnimationFrame(frame);
+    }
+  }
+
+  window.addEventListener('resize', onResize);
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(stage);
+
+  var fontReady = (document.fonts && document.fonts.load)
+    ? Promise.race([
+        document.fonts.load('800 100px Montserrat', TEXT),
+        new Promise(function (res) { setTimeout(res, 2500); })
+      ])
+    : Promise.resolve();
+  fontReady.then(start, start);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      if (started) { lastW = 0; onResize(); }
+    });
+  }
+})();
+</script>
+
+</body></html>
