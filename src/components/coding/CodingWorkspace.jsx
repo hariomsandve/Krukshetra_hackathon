@@ -264,41 +264,24 @@ class LRUCache:
 
   const handleRunTests = () => {
     setIsRunning(true);
+    setActiveBottomTab('results');
     setTimeout(() => {
       setIsRunning(false);
       setTestStatus('passed');
-      setActiveBottomTab('results');
-    }, 700);
+    }, 1200);
   };
 
+  const [editorTheme, setEditorTheme] = useState('vs');
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', background: 'var(--bg-app)', overflow: 'hidden' }}>
+    <div className="flex flex-col h-full w-full bg-[#faf9f5] overflow-hidden text-neutral-900 select-none">
       {/* 1. Header Toolbar */}
-      <div
-        style={{
-          height: '54px',
-          padding: '0 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'rgba(11, 15, 25, 0.95)',
-          borderBottom: '1px solid var(--border-subtle)',
-          flexShrink: 0
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+      <div className="h-[52px] px-4 flex items-center justify-between bg-white border-b border-[#ecebe7] shrink-0 shadow-2xs">
+        <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.8125rem'
-            }}
+            className="p-1.5 rounded-lg text-neutral-600 hover:text-neutral-900 hover:bg-[#f0ede6] transition-colors cursor-pointer"
+            title="Back to Roadmaps"
           >
             <ArrowLeft size={16} />
           </button>
@@ -307,234 +290,188 @@ class LRUCache:
           <select
             value={selectedAssessmentId}
             onChange={(e) => handleAssessmentChange(e.target.value)}
-            style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-subtle)',
-              color: '#fff',
-              fontSize: '0.875rem',
-              fontWeight: 700,
-              padding: '5px 10px',
-              borderRadius: 'var(--radius-sm)',
-              outline: 'none',
-              cursor: 'pointer'
-            }}
+            className="bg-white border border-[#dedcd5] text-neutral-900 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-xl shadow-2xs outline-none cursor-pointer focus:border-neutral-900"
           >
             {assessments.map(a => (
-              <option key={a.id} value={a.id} style={{ background: '#101827', color: '#fff' }}>
+              <option key={a.id} value={a.id} className="bg-white text-neutral-900">
                 {a.title} ({a.difficulty})
               </option>
             ))}
           </select>
 
           {/* Language Selector Dropdown */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '5px 12px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid var(--border-subtle)',
-              fontSize: '0.75rem',
-              color: '#c4b5fd',
-              cursor: 'pointer'
-            }}
+          <button
             onClick={() => handleLanguageChange(language === 'java' ? 'python' : 'java')}
+            className="bg-white border border-[#dedcd5] hover:bg-[#edebe5] text-neutral-800 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
+            title="Toggle Language"
           >
-            <span>&lt; &gt; {language === 'java' ? 'Java 17' : 'Python 3.11'}</span>
-            <ChevronDown size={12} />
-          </div>
+            <span>&lt;&gt; {language === 'java' ? 'Java 17' : 'Python 3.11'}</span>
+            <ChevronDown size={12} className="text-neutral-500" />
+          </button>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="flex items-center gap-2.5">
+          {/* Editor Theme Switcher */}
+          <button
+            onClick={() => setEditorTheme(editorTheme === 'vs' ? 'vs-dark' : 'vs')}
+            className="px-2.5 py-1.5 rounded-xl text-[11px] font-semibold border border-[#dedcd5] hover:bg-[#edebe5] text-neutral-700 bg-white transition-colors cursor-pointer shadow-2xs"
+            title="Toggle Code Editor Theme"
+          >
+            {editorTheme === 'vs' ? '☀️ Editor Light' : '🌙 Editor Dark'}
+          </button>
+
           <button
             onClick={() => setCode(currentAssessment.starterCode[language] || currentAssessment.starterCode.java)}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.75rem', padding: '5px 10px', gap: '4px' }}
+            className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#dedcd5] hover:bg-[#edebe5] text-neutral-700 bg-white transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
             title="Reset code to starter template"
           >
-            <RotateCcw size={12} /> Reset
+            <RotateCcw size={12} />
+            <span>Reset</span>
           </button>
 
           <button
             onClick={handleRunTests}
             disabled={isRunning}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.75rem', padding: '5px 12px', gap: '6px' }}
+            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-emerald-300 hover:bg-emerald-50 text-emerald-800 bg-white transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
           >
-            <Play size={12} fill="currentColor" /> Run Tests <span style={{ color: 'var(--text-muted)' }}>⌘↵</span>
+            <Play size={12} className="fill-emerald-800" />
+            <span>Run Tests</span>
+            <span className="text-[10px] text-emerald-600 font-mono">⌘↵</span>
           </button>
 
           <button
             onClick={handleRunTests}
             disabled={isRunning}
-            className="btn btn-primary"
-            style={{ fontSize: '0.75rem', padding: '5px 14px', gap: '6px' }}
+            className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-neutral-900 hover:bg-black text-white transition-colors cursor-pointer shadow-2xs flex items-center gap-1.5"
           >
-            <CloudUpload size={14} /> Submit Solution
+            <CloudUpload size={13} />
+            <span>Submit Solution</span>
           </button>
         </div>
       </div>
 
       {/* 2. Main Two-Pane Split Layout */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(340px, 460px) 1fr', overflow: 'hidden' }}>
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-[minmax(360px,460px)_1fr] overflow-hidden">
         {/* Left Pane: Problem Spec */}
-        <div
-          style={{
-            background: 'var(--bg-sidebar)',
-            borderRight: '1px solid var(--border-subtle)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
-          }}
-        >
+        <div className="bg-white border-r border-[#ecebe7] flex flex-col overflow-hidden">
           {/* Tabs */}
-          <div
-            style={{
-              display: 'flex',
-              padding: '0 16px',
-              borderBottom: '1px solid var(--border-subtle)',
-              background: 'rgba(0, 0, 0, 0.2)'
-            }}
-          >
+          <div className="flex px-5 border-b border-[#ecebe7] bg-white">
             <button
               onClick={() => setActiveLeftTab('description')}
-              style={{
-                background: 'none',
-                border: 'none',
-                borderBottom: activeLeftTab === 'description' ? '2px solid #a855f7' : '2px solid transparent',
-                padding: '10px 12px',
-                color: activeLeftTab === 'description' ? '#fff' : 'var(--text-muted)',
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
+              className={`py-2.5 px-1 text-xs sm:text-sm font-semibold border-b-2 cursor-pointer transition-colors ${
+                activeLeftTab === 'description'
+                  ? 'border-neutral-900 text-neutral-900 font-bold'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-800'
+              }`}
             >
               Description
             </button>
           </div>
 
           {/* Spec Content Scroll Area */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
+            <div className="flex items-center gap-2.5">
+              <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 {currentAssessment.difficulty}
               </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <span className="text-xs font-semibold text-neutral-500">
                 {currentAssessment.totalPoints} Points
               </span>
             </div>
 
             {/* AI Realtime Guide Box */}
-            <div
-              style={{
-                padding: '12px 14px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'rgba(168, 85, 247, 0.08)',
-                border: '1px solid rgba(168, 85, 247, 0.3)',
-                marginBottom: '18px'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#c4b5fd' }}>
-                  <Sparkles size={14} color="#a855f7" />
-                  <span>Mentos Adaptive Co-Pilot</span>
+            <div className="p-4 rounded-2xl bg-purple-50/80 border border-purple-200 shadow-2xs space-y-2">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-purple-900">
+                  <Sparkles size={14} className="text-purple-700" />
+                  <span>MentOS Adaptive Co-Pilot</span>
                 </div>
-                <span style={{ fontSize: '0.625rem', background: 'rgba(168, 85, 247, 0.25)', color: '#e9d5ff', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                <span className="text-[10px] bg-purple-100 text-purple-900 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-purple-200">
                   PEDAGOGICAL HINT
                 </span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: '#cbd5e1', lineHeight: 1.55 }}>
+              <p className="text-xs text-purple-950 leading-relaxed font-medium">
                 {currentAssessment.hint}
               </p>
             </div>
 
             {/* Functional Spec */}
-            <h3 style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#ffffff', marginBottom: '10px' }}>
-              Specification
-            </h3>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '16px' }}>
-              {currentAssessment.description}
-            </p>
+            <div>
+              <h3 className="text-sm font-extrabold text-neutral-900 mb-2 tracking-tight">
+                Specification
+              </h3>
+              <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed">
+                {currentAssessment.description}
+              </p>
+            </div>
 
             {/* Examples */}
-            {currentAssessment.examples.map((ex, idx) => (
-              <div key={idx} style={{ marginBottom: '14px' }}>
-                <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff', marginBottom: '6px', textTransform: 'uppercase' }}>
-                  EXAMPLE {idx + 1}
-                </h4>
-                <div
-                  style={{
-                    padding: '10px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    background: 'rgba(0, 0, 0, 0.3)',
-                    border: '1px solid var(--border-subtle)',
-                    fontFamily: 'monospace',
-                    fontSize: '0.75rem',
-                    color: '#cbd5e1',
-                    lineHeight: 1.6
-                  }}
-                >
-                  <div style={{ color: 'var(--text-muted)', marginBottom: '2px' }}>INPUT</div>
-                  <div>{ex.input}</div>
-                  <div style={{ color: 'var(--text-muted)', marginTop: '6px', marginBottom: '2px' }}>OUTPUT</div>
-                  <div>{ex.output}</div>
+            <div className="space-y-3 pt-1">
+              {currentAssessment.examples.map((ex, idx) => (
+                <div key={idx} className="space-y-1.5">
+                  <h4 className="text-[11px] font-bold text-neutral-600 uppercase tracking-wider">
+                    EXAMPLE {idx + 1}
+                  </h4>
+                  <div className="p-3.5 rounded-xl bg-[#faf9f5] border border-[#ecebe7] font-mono text-xs text-neutral-800 leading-relaxed space-y-2 shadow-2xs">
+                    <div>
+                      <div className="text-[10px] font-bold uppercase text-neutral-500 tracking-wider">INPUT</div>
+                      <div className="font-semibold text-neutral-900">{ex.input}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase text-neutral-500 tracking-wider">OUTPUT</div>
+                      <div className="font-semibold text-emerald-700">{ex.output}</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
 
             {/* Constraints */}
-            <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ffffff', marginBottom: '8px', textTransform: 'uppercase', marginTop: '16px' }}>
-              Constraints
-            </h4>
-            <ul style={{ paddingLeft: '16px', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
-              {currentAssessment.constraints.map((c, i) => (
-                <li key={i}>{c}</li>
-              ))}
-            </ul>
+            <div className="pt-2">
+              <h4 className="text-[11px] font-bold text-neutral-600 uppercase tracking-wider mb-2">
+                Constraints
+              </h4>
+              <ul className="list-disc pl-4 space-y-1 text-xs text-neutral-600 leading-relaxed font-mono">
+                {currentAssessment.constraints.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
         {/* Right Pane: Code Editor + Bottom Test Execution Panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        <div className="flex flex-col h-full overflow-hidden bg-white">
           {/* Editor Header Tab */}
-          <div
-            style={{
-              height: '38px',
-              padding: '0 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: '#0e1424',
-              borderBottom: '1px solid var(--border-subtle)',
-              fontSize: '0.75rem',
-              color: 'var(--text-secondary)'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#a855f7' }} />
-              <strong style={{ color: '#fff' }}>{language === 'java' ? 'Solution.java' : 'solution.py'}</strong>
-              <span style={{ color: 'var(--text-muted)' }}>• UTF-8</span>
+          <div className="h-[38px] px-4 flex items-center justify-between bg-[#faf9f5] border-b border-[#ecebe7] text-xs shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-purple-600 inline-block" />
+              <strong className="text-neutral-900 font-bold">{language === 'java' ? 'Solution.java' : 'solution.py'}</strong>
+              <span className="text-neutral-400 font-mono text-[11px]">• UTF-8</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.6875rem' }}>
+            <div className="flex items-center gap-3 text-xs">
               <button
                 onClick={() => navigator.clipboard.writeText(code)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                className="text-neutral-500 hover:text-neutral-900 cursor-pointer flex items-center gap-1 transition-colors"
+                title="Copy Code"
               >
-                <Copy size={12} /> Copy
+                <Copy size={12} />
+                <span>Copy</span>
               </button>
-              <span style={{ color: '#34d399' }}>● {language === 'java' ? 'JDK 17 Language Server' : 'Python 3.11'}</span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                <span>{language === 'java' ? 'JDK 17 Language Server' : 'Python 3.11'}</span>
+              </span>
             </div>
           </div>
 
           {/* Monaco Editor */}
-          <div style={{ flex: 1, minHeight: '260px', overflow: 'hidden' }}>
+          <div className="flex-1 min-h-[240px] overflow-hidden bg-white">
             <Editor
               height="100%"
               language={language}
-              theme="vs-dark"
+              theme={editorTheme}
               value={code}
               onChange={(val) => setCode(val || '')}
               options={{
@@ -551,64 +488,32 @@ class LRUCache:
           </div>
 
           {/* Bottom Test Results Panel */}
-          <div
-            style={{
-              height: '240px',
-              background: '#0d1322',
-              borderTop: '1px solid var(--border-subtle)',
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'relative'
-            }}
-          >
+          <div className="h-[250px] bg-white border-t border-[#ecebe7] flex flex-col relative shrink-0">
             {/* Results Tabs & Metrics */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '0 16px',
-                borderBottom: '1px solid var(--border-subtle)',
-                background: 'rgba(0, 0, 0, 0.2)'
-              }}
-            >
-              <div style={{ display: 'flex', gap: '16px' }}>
+            <div className="h-10 px-4 flex items-center justify-between border-b border-[#ecebe7] bg-[#faf9f5] shrink-0">
+              <div className="flex items-center gap-4">
                 <button
                   onClick={() => setActiveBottomTab('results')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    borderBottom: activeBottomTab === 'results' ? '2px solid #a855f7' : '2px solid transparent',
-                    padding: '8px 0',
-                    color: activeBottomTab === 'results' ? '#fff' : 'var(--text-muted)',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
+                  className={`py-2 text-xs font-semibold cursor-pointer border-b-2 flex items-center gap-2 transition-colors ${
+                    activeBottomTab === 'results'
+                      ? 'border-neutral-900 text-neutral-900 font-bold'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-800'
+                  }`}
                 >
-                  <CheckCircle2 size={13} color="#10b981" />
+                  <CheckCircle2 size={13} className="text-emerald-600" />
                   <span>Test Results</span>
-                  <span style={{ fontSize: '0.625rem', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', padding: '1px 5px', borderRadius: '4px' }}>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                     Passed {currentAssessment.testCases.length}/{currentAssessment.testCases.length}
                   </span>
                 </button>
 
                 <button
                   onClick={() => setActiveBottomTab('console')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    padding: '8px 0',
-                    color: activeBottomTab === 'console' ? '#fff' : 'var(--text-muted)',
-                    fontSize: '0.75rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
+                  className={`py-2 text-xs font-semibold cursor-pointer border-b-2 flex items-center gap-2 transition-colors ${
+                    activeBottomTab === 'console'
+                      ? 'border-neutral-900 text-neutral-900 font-bold'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-800'
+                  }`}
                 >
                   <Terminal size={13} />
                   <span>Console Output</span>
@@ -616,66 +521,63 @@ class LRUCache:
               </div>
 
               {/* Performance Metrics */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
-                <span>Runtime: <strong style={{ color: '#34d399' }}>2ms</strong> (Faster than 94.2%)</span>
-                <span>Memory: <strong style={{ color: '#f8fafc' }}>42.1 MB</strong></span>
+              <div className="flex items-center gap-3 text-xs text-neutral-500 font-medium">
+                <span>Runtime: <strong className="text-emerald-700 font-bold">2ms</strong> (Faster than 94.2%)</span>
+                <span>•</span>
+                <span>Memory: <strong className="text-neutral-900 font-bold">42.1 MB</strong></span>
               </div>
             </div>
 
             {/* Test Cases Sub-body */}
-            <div style={{ flex: 1, padding: '12px 16px', display: 'flex', gap: '16px', overflowY: 'auto' }}>
+            <div className="flex-1 p-3.5 px-4 flex gap-4 overflow-y-auto bg-white">
               {/* Cases List */}
-              <div style={{ width: '200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.04em' }}>
+              <div className="w-[200px] flex flex-col gap-1.5 shrink-0">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-0.5">
                   TEST CASES
                 </span>
 
                 {currentAssessment.testCases.map((c) => (
-                  <div
+                  <button
                     key={c.id}
                     onClick={() => setSelectedCase(c.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '6px 10px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: selectedCase === c.id ? 'rgba(168, 85, 247, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                      border: selectedCase === c.id ? '1px solid rgba(168, 85, 247, 0.35)' : '1px solid var(--border-subtle)',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem'
-                    }}
+                    className={`flex items-center justify-between p-2 px-3 rounded-xl border text-xs cursor-pointer transition-colors text-left ${
+                      selectedCase === c.id
+                        ? 'bg-purple-50 border-purple-200 text-purple-950 font-bold shadow-2xs'
+                        : 'bg-[#faf9f5] border-[#ecebe7] text-neutral-700 hover:bg-[#edebe5]'
+                    }`}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff' }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
-                      <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '120px' }}>{c.label}</span>
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span className="truncate">{c.label}</span>
                     </div>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '0.6875rem' }}>{c.time}</span>
-                  </div>
+                    <span className="text-[11px] font-mono text-neutral-500 shrink-0 ml-1">{c.time}</span>
+                  </button>
                 ))}
               </div>
 
               {/* Case Details */}
-              <div style={{ flex: 1, background: 'rgba(0, 0, 0, 0.25)', borderRadius: '6px', padding: '10px 14px', border: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
+              <div className="flex-1 bg-[#faf9f5] rounded-xl p-3.5 border border-[#ecebe7] text-xs space-y-2.5">
                 {(() => {
                   const activeTc = currentAssessment.testCases.find(tc => tc.id === selectedCase) || currentAssessment.testCases[0];
                   return (
                     <div>
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '8px' }}>
-                        <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontWeight: 700 }}>
+                      <div className="flex items-center gap-2.5 mb-2.5">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">
                           PASSED
                         </span>
-                        <span style={{ color: 'var(--text-muted)' }}>Runtime: {activeTc.time} • Execution OK</span>
+                        <span className="text-xs text-neutral-500">
+                          Runtime: {activeTc.time} • Execution OK
+                        </span>
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontFamily: 'monospace' }}>
-                        <div>
-                          <div style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', marginBottom: '2px' }}>INPUT</div>
-                          <div style={{ color: '#cbd5e1' }}>{activeTc.input}</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono">
+                        <div className="bg-white border border-[#ecebe7] rounded-lg p-2.5 shadow-2xs">
+                          <div className="text-[10px] font-bold uppercase text-neutral-400 mb-1">INPUT</div>
+                          <div className="text-neutral-900 font-semibold">{activeTc.input}</div>
                         </div>
-                        <div>
-                          <div style={{ color: 'var(--text-muted)', fontSize: '0.6875rem', marginBottom: '2px' }}>EXPECTED OUTPUT</div>
-                          <div style={{ color: '#cbd5e1' }}>{activeTc.expected}</div>
+                        <div className="bg-white border border-[#ecebe7] rounded-lg p-2.5 shadow-2xs">
+                          <div className="text-[10px] font-bold uppercase text-neutral-400 mb-1">EXPECTED OUTPUT</div>
+                          <div className="text-emerald-700 font-semibold">{activeTc.expected}</div>
                         </div>
                       </div>
                     </div>
@@ -685,25 +587,10 @@ class LRUCache:
             </div>
 
             {/* Floating Live Viva Prompt Box bottom right */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '12px',
-                right: '16px',
-                background: 'rgba(16, 22, 38, 0.95)',
-                border: '1px solid rgba(168, 85, 247, 0.4)',
-                borderRadius: 'var(--radius-md)',
-                padding: '8px 14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5), 0 0 14px rgba(168, 85, 247, 0.25)',
-                backdropFilter: 'blur(10px)'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#cbd5e1' }}>
-                <Sparkles size={15} color="#a855f7" />
-                <span>Ready for live viva: Mentos is analyzing your algorithmic logic.</span>
+            <div className="absolute bottom-3 right-4 bg-white/95 backdrop-blur-md border border-purple-200 rounded-2xl p-2.5 px-4 flex items-center gap-3 shadow-lg">
+              <div className="flex items-center gap-2 text-xs font-medium text-neutral-700">
+                <Sparkles size={14} className="text-purple-600" />
+                <span>Ready for viva: MentOS verified logic</span>
               </div>
 
               <button
@@ -711,10 +598,10 @@ class LRUCache:
                   if (onStartViva) onStartViva();
                   else if (onOpenVoiceTutor) onOpenVoiceTutor();
                 }}
-                className="btn btn-primary"
-                style={{ fontSize: '0.6875rem', padding: '5px 12px', gap: '4px' }}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-neutral-900 hover:bg-black text-white flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
               >
-                <Mic size={12} /> Start 2-min Code Viva ›
+                <Mic size={12} />
+                <span>Start AI Viva ›</span>
               </button>
             </div>
           </div>

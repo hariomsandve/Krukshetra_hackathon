@@ -28,35 +28,23 @@ export const CodeVivaWorkspace = ({ onBack, onOpenVoiceTutor }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [submittedAnswers, setSubmittedAnswers] = useState({
     0: mockData.codeViva?.sampleResponses?.[0]?.response || '',
-    1: mockData.codeViva?.sampleResponses?.[1]?.response || ''
   });
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [showEvaluation, setShowEvaluation] = useState(true);
+  const [showEvaluation, setShowEvaluation] = useState(false);
 
-  const viva = mockData.codeViva || {
-    questions: [],
-    sampleResponses: [],
-    sampleFeedback: {
-      strengths: ['Explains the complement lookup correctly'],
-      improvements: ['Discuss worst-case hash map behavior', 'Mention edge cases explicitly'],
-      score: 12,
-      maxScore: 15
-    }
-  };
+  const viva = mockData.codeViva;
+  const replay = mockData.sessionReplay;
 
-  const replay = mockData.sessionReplay || {
-    sessionId: 'replay-001',
-    durationSeconds: 642,
-    events: [],
-    integritySignals: []
-  };
+  const submissionCode = `import java.util.*;
 
-  const submissionCode = mockData.codingWorkspace?.sampleSubmission?.code?.replace(/\\n/g, '\n') || `class Solution {
+class Solution {
     public int[] twoSum(int[] nums, int target) {
         Map<Integer, Integer> seen = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
             int need = target - nums[i];
-            if (seen.containsKey(need)) return new int[]{seen.get(need), i};
+            if (seen.containsKey(need)) {
+                return new int[]{seen.get(need), i};
+            }
             seen.put(nums[i], i);
         }
         return new int[]{};
@@ -100,225 +88,196 @@ export const CodeVivaWorkspace = ({ onBack, onOpenVoiceTutor }) => {
   };
 
   return (
-    <div style={{ padding: '24px 32px', display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+    <div className="p-5 sm:p-8 flex flex-col gap-6 max-w-7xl mx-auto w-full bg-[#faf9f5] min-h-full text-neutral-900 select-none">
       {/* Top Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px' }}>
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <span className="badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c4b5fd' }}>
-              <Mic size={12} style={{ marginRight: '4px' }} /> Mentos Oral AI Viva Defense
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-purple-100 text-purple-900 border border-purple-200">
+              <Mic className="w-3.5 h-3.5" />
+              <span>MentOS Oral AI Viva Defense</span>
             </span>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <span className="text-xs text-neutral-500 font-medium">
               Candidate: {mockData.currentUser.displayName} • Two Sum
             </span>
           </div>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
             Interactive AI Code Viva & Session Integrity
           </h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-            2-minute voice/text adaptive interrogation to verify authorship, algorithmic reasoning, and code comprehension.
+          <p className="text-xs sm:text-sm text-neutral-600 mt-1 max-w-2xl leading-relaxed">
+            Adaptive voice & text interrogation to verify algorithmic reasoning, authorship, and solution comprehension.
           </p>
         </div>
 
         {/* Action Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={() => {
               if (onOpenVoiceTutor) onOpenVoiceTutor();
             }}
-            className="btn btn-secondary"
-            style={{ fontSize: '0.78125rem', padding: '7px 14px', gap: '6px' }}
+            className="px-3.5 py-1.5 rounded-xl border border-[#dedcd5] hover:bg-[#edebe5] text-xs font-semibold text-neutral-800 flex items-center gap-2 transition-colors cursor-pointer bg-white shadow-2xs"
           >
-            <Volume2 size={14} color="#a855f7" /> Launch Voice Agent
+            <Volume2 className="w-4 h-4 text-purple-700" />
+            <span>Launch Voice Agent</span>
           </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#34d399' }}>Live Viva Ready</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
+            <span>Live Viva Ready</span>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '2px' }}>
+      <div className="flex items-center gap-3 border-b border-[#dedcd5] pb-1">
         <button
           onClick={() => setActiveTab('viva')}
-          style={{
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'viva' ? '2px solid var(--accent-primary)' : '2px solid transparent',
-            color: activeTab === 'viva' ? '#fff' : 'var(--text-muted)',
-            fontWeight: activeTab === 'viva' ? 600 : 400,
-            fontSize: '0.875rem',
-            padding: '8px 16px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
+          className={`px-4 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+            activeTab === 'viva'
+              ? 'text-neutral-900 border-b-2 border-neutral-900 font-bold'
+              : 'text-neutral-500 hover:text-neutral-800'
+          }`}
         >
-          <Mic size={15} /> Oral Interrogation ({viva.questions.length} Probes)
+          <Mic className="w-4 h-4" />
+          <span>Oral Interrogation ({viva.questions.length} Probes)</span>
         </button>
         <button
           onClick={() => setActiveTab('replay')}
-          style={{
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'replay' ? '2px solid var(--accent-primary)' : '2px solid transparent',
-            color: activeTab === 'replay' ? '#fff' : 'var(--text-muted)',
-            fontWeight: activeTab === 'replay' ? 600 : 400,
-            fontSize: '0.875rem',
-            padding: '8px 16px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
+          className={`px-4 py-2 text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+            activeTab === 'replay'
+              ? 'text-neutral-900 border-b-2 border-neutral-900 font-bold'
+              : 'text-neutral-500 hover:text-neutral-800'
+          }`}
         >
-          <ShieldAlert size={15} /> Session Replay & Integrity Signals ({replay.integritySignals.length})
+          <ShieldAlert className="w-4 h-4" />
+          <span>Session Replay & Integrity Signals ({replay.integritySignals.length})</span>
         </button>
       </div>
 
       {/* TAB 1: VIVA ORAL INTERROGATION */}
       {activeTab === 'viva' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(380px, 460px) 1fr', gap: '20px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Left Column: Candidate's Code Submission */}
-          <div className="surface-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', background: 'rgba(16, 22, 38, 0.75)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Code2 size={16} color="#a855f7" />
-                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#fff' }}>Candidate Submission</h3>
+          <div className="lg:col-span-5 bg-white border border-[#e5e3dc] rounded-2xl p-5 shadow-xs flex flex-col">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Code2 className="w-4 h-4 text-purple-700" />
+                <h3 className="text-sm font-bold text-neutral-900">Candidate Submission</h3>
               </div>
-              <span className="badge" style={{ fontSize: '0.6875rem', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8' }}>
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
                 Java 17 • Two Sum
               </span>
             </div>
 
-            <pre
-              style={{
-                flex: 1,
-                background: '#090d16',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '16px',
-                color: '#e2e8f0',
-                fontSize: '0.78125rem',
-                fontFamily: 'Consolas, Monaco, "Courier New", monospace',
-                lineHeight: 1.6,
-                overflowX: 'auto',
-                whiteSpace: 'pre'
-              }}
-            >
+            <pre className="flex-1 bg-[#18181b] border border-neutral-800 rounded-xl p-4 text-neutral-100 text-xs font-mono leading-relaxed overflow-x-auto shadow-inner">
               <code>{submissionCode}</code>
             </pre>
 
-            <div style={{ marginTop: '12px', padding: '10px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-subtle)', fontSize: '0.71875rem', color: 'var(--text-muted)' }}>
-              <span>AI Verification: Evaluates algorithmic logic, time complexity justification, and test coverage reasoning.</span>
+            <div className="mt-3 p-3 rounded-xl bg-[#faf9f5] border border-[#ecebe7] text-[11px] text-neutral-600 leading-normal">
+              AI Verification evaluates algorithmic logic, time complexity trade-offs, and edge case handling.
             </div>
           </div>
 
-          {/* Right Column: AI Interrogator Questions & Live Defense */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* Active Question Box */}
-            <div className="surface-card" style={{ padding: '24px', background: 'rgba(16, 22, 38, 0.75)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="badge" style={{ background: 'rgba(168, 85, 247, 0.2)', color: '#c4b5fd' }}>
+          {/* Right Column: Active Question & Live Defense */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+            <div className="bg-white border border-[#e5e3dc] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-900 border border-purple-200">
                     Probe {currentQuestionIdx + 1} of {viva.questions.length}
                   </span>
-                  <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                    Category: {currentQ?.category}
+                  <span className="text-xs font-mono uppercase px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-700 border border-neutral-200">
+                    {currentQ?.category}
                   </span>
                 </div>
-                <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                <span className="text-xs font-bold text-emerald-700">
                   Max: {currentQ?.maxPoints} pts
                 </span>
               </div>
 
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff', lineHeight: 1.4, marginBottom: '14px' }}>
+              <h2 className="text-base sm:text-xl font-bold text-neutral-900 leading-snug">
                 "{currentQ?.question}"
               </h2>
 
               {/* Expected Key Concepts */}
-              <div style={{ marginBottom: '18px' }}>
-                <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '6px' }}>
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
                   Key Expected Rationales:
                 </span>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div className="flex flex-wrap gap-1.5">
                   {currentQ?.expectedTopics?.map((topic, i) => (
-                    <span key={i} className="badge" style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#a5b4fc', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
+                    <span
+                      key={i}
+                      className="text-xs px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-800 border border-indigo-200 font-medium"
+                    >
                       • {topic}
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* Response Input Area (Mic / Text) */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ position: 'relative' }}>
+              {/* Response Input Area */}
+              <div className="space-y-3 pt-2">
+                <div className="relative">
                   <textarea
                     rows={4}
-                    placeholder="Speak your defense or type explanation here..."
+                    placeholder="Speak your defense or type your technical explanation here..."
                     value={userResponse}
                     onChange={(e) => setUserResponse(e.target.value)}
-                    className="form-input"
-                    style={{
-                      width: '100%',
-                      background: '#090d16',
-                      borderColor: isRecording ? '#a855f7' : 'var(--border-subtle)',
-                      boxShadow: isRecording ? '0 0 12px rgba(168, 85, 247, 0.3)' : 'none',
-                      fontSize: '0.84375rem',
-                      lineHeight: 1.5,
-                      padding: '12px 14px',
-                      resize: 'vertical'
-                    }}
+                    className={`w-full bg-[#faf9f5] border text-xs sm:text-sm text-neutral-900 p-3.5 rounded-xl outline-none transition-all placeholder:text-neutral-400 ${
+                      isRecording
+                        ? 'border-purple-600 ring-2 ring-purple-100 bg-white'
+                        : 'border-[#dedcd5] focus:border-neutral-900 focus:bg-white'
+                    }`}
                   />
                   {isRecording && (
-                    <div style={{ position: 'absolute', right: '12px', top: '12px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.6875rem', color: '#a855f7' }}>
-                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#a855f7', animation: 'pulse 1s infinite' }} />
-                      Transcribing live speech...
+                    <div className="absolute right-3 top-3 flex items-center gap-1.5 text-xs font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
+                      <span className="w-2 h-2 rounded-full bg-purple-600 animate-ping" />
+                      <span>Recording speech...</span>
                     </div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={toggleMic}
-                      className={isRecording ? 'btn btn-primary' : 'btn btn-secondary'}
-                      style={{ fontSize: '0.75rem', padding: '6px 14px', gap: '6px' }}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border ${
+                        isRecording
+                          ? 'bg-rose-600 text-white border-rose-700'
+                          : 'bg-white hover:bg-[#edebe5] text-neutral-800 border-[#dedcd5]'
+                      }`}
                     >
-                      {isRecording ? <MicOff size={14} /> : <Mic size={14} />}
-                      {isRecording ? 'Stop Recording' : 'Speak via Mic'}
+                      {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                      <span>{isRecording ? 'Stop Recording' : 'Speak via Mic'}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={handlePreFillSample}
-                      className="btn btn-secondary"
-                      style={{ fontSize: '0.75rem', padding: '6px 12px', color: '#c4b5fd' }}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      <Sparkles size={13} style={{ marginRight: '4px' }} /> Auto-fill Sample Answer
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Auto-fill Sample</span>
                     </button>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div className="flex items-center gap-2">
                     {currentQuestionIdx > 0 && (
                       <button
-                        onClick={() => setCurrentQuestionIdx(prev => prev - 1)}
-                        className="btn btn-secondary"
-                        style={{ fontSize: '0.75rem', padding: '6px 14px' }}
+                        onClick={() => setCurrentQuestionIdx((prev) => prev - 1)}
+                        className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-neutral-700 bg-white hover:bg-[#edebe5] border border-[#dedcd5] transition-colors cursor-pointer"
                       >
                         Previous
                       </button>
                     )}
                     <button
                       onClick={handleSubmitResponse}
-                      className="btn btn-primary"
-                      style={{ fontSize: '0.75rem', padding: '6px 18px', gap: '6px' }}
+                      className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-neutral-900 hover:bg-black text-white flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                     >
-                      Submit Response <ArrowRight size={13} />
+                      <span>Submit Response</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -327,39 +286,43 @@ export const CodeVivaWorkspace = ({ onBack, onOpenVoiceTutor }) => {
 
             {/* AI Evaluator Feedback Score Card */}
             {showEvaluation && (
-              <div className="surface-card" style={{ padding: '22px', background: 'rgba(16, 22, 38, 0.75)', border: '1px solid rgba(168, 85, 247, 0.3)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Award size={18} color="#a855f7" />
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#fff' }}>
-                      Mentos AI Viva Evaluation
+              <div className="bg-[#faf9f5] border border-purple-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-3 animate-in fade-in">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-purple-700" />
+                    <h3 className="text-base font-bold text-neutral-900">
+                      MentOS AI Viva Evaluation Scorecard
                     </h3>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                    <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#10b981' }}>{viva.sampleFeedback.score}</span>
-                    <span style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>/ {viva.sampleFeedback.maxScore} pts (80%)</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black text-emerald-700">
+                      {viva.sampleFeedback.score}
+                    </span>
+                    <span className="text-xs font-mono text-neutral-500">
+                      / {viva.sampleFeedback.maxScore} pts (80%)
+                    </span>
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '12px' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   {/* Strengths */}
-                  <div style={{ padding: '12px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                    <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#34d399', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
-                      <CheckCircle2 size={12} /> Demonstrated Strengths
+                  <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1.5">
+                    <span className="text-xs font-bold text-emerald-800 uppercase flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Demonstrated Strengths
                     </span>
-                    <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.78125rem', color: '#e2e8f0' }}>
+                    <ul className="text-xs text-neutral-700 space-y-1 pl-4 list-disc">
                       {viva.sampleFeedback.strengths.map((str, i) => (
                         <li key={i}>{str}</li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Areas for Improvement */}
-                  <div style={{ padding: '12px 14px', borderRadius: 'var(--radius-sm)', background: 'rgba(245, 158, 11, 0.06)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-                    <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#fbbf24', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
-                      <AlertTriangle size={12} /> Areas to Elaborate
+                  {/* Improvements */}
+                  <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 space-y-1.5">
+                    <span className="text-xs font-bold text-amber-900 uppercase flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5" /> Areas to Elaborate
                     </span>
-                    <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.78125rem', color: '#e2e8f0' }}>
+                    <ul className="text-xs text-neutral-700 space-y-1 pl-4 list-disc">
                       {viva.sampleFeedback.improvements.map((imp, i) => (
                         <li key={i}>{imp}</li>
                       ))}
@@ -367,7 +330,7 @@ export const CodeVivaWorkspace = ({ onBack, onOpenVoiceTutor }) => {
                   </div>
                 </div>
 
-                <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', textAlign: 'right' }}>
+                <div className="text-[11px] text-neutral-500 text-right pt-1 font-mono">
                   {viva.sampleFeedback.notice}
                 </div>
               </div>
@@ -378,57 +341,52 @@ export const CodeVivaWorkspace = ({ onBack, onOpenVoiceTutor }) => {
 
       {/* TAB 2: SESSION REPLAY & INTEGRITY SIGNALS */}
       {activeTab === 'replay' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '20px' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Replay Timeline Events */}
-          <div className="surface-card" style={{ padding: '22px', background: 'rgba(16, 22, 38, 0.75)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div className="lg:col-span-8 bg-white border border-[#e5e3dc] rounded-2xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-[#ecebe7]">
               <div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#fff' }}>Assessment Keystroke & Event Timeline</h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Full chronological record of candidate interaction within the coding workspace</p>
+                <h3 className="text-base font-bold text-neutral-900">Keystroke & Event Timeline</h3>
+                <p className="text-xs text-neutral-500">
+                  Chronological record of candidate interaction in the coding workspace
+                </p>
               </div>
-              <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)' }}>
-                Total Duration: {Math.floor(replay.durationSeconds / 60)}m {replay.durationSeconds % 60}s
+              <span className="text-xs font-mono font-medium px-2.5 py-1 rounded-md bg-[#faf9f5] border border-[#dedcd5] text-neutral-600">
+                Duration: {Math.floor(replay.durationSeconds / 60)}m {replay.durationSeconds % 60}s
               </span>
             </div>
 
-            {/* Event List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="space-y-2">
               {replay.events.map((evt) => {
                 const isPaste = evt.type === 'paste';
                 const isTab = evt.type === 'tab-visibility';
                 const isRun = evt.type === 'run';
-                const color = isPaste ? '#ef4444' : isTab ? '#f59e0b' : isRun ? '#10b981' : '#818cf8';
-                const bg = isPaste ? 'rgba(239, 68, 68, 0.08)' : isTab ? 'rgba(245, 158, 11, 0.08)' : 'rgba(255, 255, 255, 0.02)';
 
                 return (
                   <div
                     key={evt.id}
-                    style={{
-                      padding: '12px 16px',
-                      borderRadius: 'var(--radius-md)',
-                      background: bg,
-                      border: `1px solid ${isPaste || isTab ? 'rgba(255, 255, 255, 0.1)' : 'var(--border-subtle)'}`,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
+                    className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs ${
+                      isPaste
+                        ? 'bg-rose-50 border-rose-200 text-rose-900'
+                        : isTab
+                        ? 'bg-amber-50 border-amber-200 text-amber-900'
+                        : isRun
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                        : 'bg-[#faf9f5] border-[#ecebe7] text-neutral-800'
+                    }`}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-muted)', width: '50px' }}>
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-neutral-500 text-[11px] w-12 shrink-0">
                         T+{evt.timeSeconds}s
                       </span>
                       <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '0.84375rem', fontWeight: 600, color: '#fff' }}>
-                            {evt.label}
-                          </span>
-                          <span className="badge" style={{ fontSize: '0.625rem', color, border: `1px solid ${color}40` }}>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-neutral-900">{evt.label}</span>
+                          <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/70 border border-current">
                             {evt.evidence}
                           </span>
                         </div>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: '2px 0 0' }}>
-                          {evt.details}
-                        </p>
+                        <p className="text-[11px] text-neutral-600 mt-0.5">{evt.details}</p>
                       </div>
                     </div>
                   </div>
@@ -437,65 +395,47 @@ export const CodeVivaWorkspace = ({ onBack, onOpenVoiceTutor }) => {
             </div>
           </div>
 
-          {/* Integrity Signals & Human Review Queue */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className="surface-card" style={{ padding: '22px', background: 'rgba(16, 22, 38, 0.75)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                <ShieldAlert size={18} color="#f59e0b" />
-                <h3 style={{ fontSize: '0.975rem', fontWeight: 700, color: '#fff' }}>
-                  Integrity Signals for Review
-                </h3>
+          {/* Integrity Signals */}
+          <div className="lg:col-span-4 bg-white border border-[#e5e3dc] rounded-2xl p-6 shadow-xs space-y-4 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 pb-2 border-b border-[#ecebe7]">
+                <ShieldAlert className="w-4 h-4 text-amber-600" />
+                <h3 className="text-sm font-bold text-neutral-900">Integrity Signals for Review</h3>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+              <div className="space-y-2">
                 {replay.integritySignals.map((signal) => (
                   <div
                     key={signal.id}
-                    style={{
-                      padding: '12px 14px',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'rgba(245, 158, 11, 0.05)',
-                      border: '1px solid rgba(245, 158, 11, 0.25)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px'
-                    }}
+                    className="p-3 rounded-xl bg-amber-50/70 border border-amber-200 space-y-1 text-xs"
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#fbbf24' }}>
-                        {signal.label}
-                      </span>
-                      <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: '0.65rem' }}>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-amber-950">{signal.label}</span>
+                      <span className="text-[10px] font-mono font-semibold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800">
                         {signal.status}
                       </span>
                     </div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>
-                      {signal.explanation}
-                    </p>
+                    <p className="text-[11px] text-neutral-600">{signal.explanation}</p>
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
-                  Human Review Status:
-                </span>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={() => alert("Marked as Verified Authentic by Evaluator.")}
-                    className="btn btn-secondary"
-                    style={{ flex: 1, fontSize: '0.71875rem', color: '#10b981' }}
-                  >
-                    <CheckCircle2 size={13} style={{ marginRight: '4px' }} /> Authentic
-                  </button>
-                  <button
-                    onClick={() => alert("Flagged for secondary trainer oral interview.")}
-                    className="btn btn-secondary"
-                    style={{ flex: 1, fontSize: '0.71875rem', color: '#f59e0b' }}
-                  >
-                    <AlertTriangle size={13} style={{ marginRight: '4px' }} /> Flag Probe
-                  </button>
-                </div>
+            <div className="pt-4 border-t border-[#ecebe7] space-y-2">
+              <span className="text-[11px] font-semibold text-neutral-500">Human Evaluator Action:</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => alert("Marked as Verified Authentic by Evaluator.")}
+                  className="flex-1 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  ✓ Authentic
+                </button>
+                <button
+                  onClick={() => alert("Flagged for secondary trainer oral interview.")}
+                  className="flex-1 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  ⚠ Flag Probe
+                </button>
               </div>
             </div>
           </div>

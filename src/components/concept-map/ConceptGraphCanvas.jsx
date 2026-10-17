@@ -145,9 +145,9 @@ export const ConceptGraphCanvas = ({
         position: 'relative',
         width: '100%',
         height: '620px',
-        background: 'radial-gradient(circle at 50% 50%, #0d1527 0%, var(--bg-app) 100%)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: 'var(--radius-lg)',
+        background: '#faf9f5',
+        border: '1px solid #e5e3dc',
+        borderRadius: '16px',
         overflow: 'hidden',
         userSelect: 'none'
       }}
@@ -174,22 +174,22 @@ export const ConceptGraphCanvas = ({
         {/* Search & Filter */}
         <div style={{ display: 'flex', gap: '8px', pointerEvents: 'auto' }}>
           <div style={{ position: 'relative', width: '220px' }}>
-            <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: 'var(--text-muted)' }} />
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: '#71717a' }} />
             <input
               type="text"
               placeholder="Search concepts in DAG..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="form-input"
-              style={{ paddingLeft: '32px', fontSize: '0.75rem', height: '34px', background: 'rgba(11, 17, 30, 0.9)', backdropFilter: 'blur(8px)' }}
+              className="bg-white border border-[#dedcd5] text-neutral-900 rounded-xl px-3 py-1.5 text-xs shadow-2xs outline-none focus:border-neutral-900"
+              style={{ paddingLeft: '32px', height: '34px', width: '100%' }}
             />
           </div>
 
           <select
             value={difficultyFilter}
             onChange={(e) => setDifficultyFilter(e.target.value)}
-            className="form-select"
-            style={{ width: '130px', fontSize: '0.75rem', height: '34px', background: 'rgba(11, 17, 30, 0.9)', backdropFilter: 'blur(8px)' }}
+            className="bg-white border border-[#dedcd5] text-neutral-900 rounded-xl px-3 py-1.5 text-xs shadow-2xs outline-none cursor-pointer focus:border-neutral-900"
+            style={{ width: '130px', height: '34px' }}
           >
             <option value="all">All Difficulties</option>
             <option value="beginner">Beginner</option>
@@ -204,27 +204,27 @@ export const ConceptGraphCanvas = ({
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            background: 'rgba(11, 17, 30, 0.9)',
-            backdropFilter: 'blur(8px)',
-            padding: '4px',
-            borderRadius: 'var(--radius-sm)',
-            border: '1px solid var(--border-subtle)',
+            background: '#ffffff',
+            padding: '4px 8px',
+            borderRadius: '12px',
+            border: '1px solid #dedcd5',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
             pointerEvents: 'auto'
           }}
         >
-          <button onClick={handleZoomIn} className="btn btn-ghost" style={{ padding: '6px' }} title="Zoom in">
+          <button onClick={handleZoomIn} className="p-1 rounded text-neutral-600 hover:text-neutral-900 hover:bg-[#f0ede6] transition-colors cursor-pointer" title="Zoom in">
             <ZoomIn size={15} />
           </button>
-          <button onClick={handleZoomOut} className="btn btn-ghost" style={{ padding: '6px' }} title="Zoom out">
+          <button onClick={handleZoomOut} className="p-1 rounded text-neutral-600 hover:text-neutral-900 hover:bg-[#f0ede6] transition-colors cursor-pointer" title="Zoom out">
             <ZoomOut size={15} />
           </button>
-          <button onClick={handleFitToScreen} className="btn btn-ghost" style={{ padding: '6px' }} title="Fit graph to view">
+          <button onClick={handleFitToScreen} className="p-1 rounded text-neutral-600 hover:text-neutral-900 hover:bg-[#f0ede6] transition-colors cursor-pointer" title="Fit graph to view">
             <Maximize2 size={15} />
           </button>
-          <button onClick={handleReset} className="btn btn-ghost" style={{ padding: '6px' }} title="Reset zoom and position">
+          <button onClick={handleReset} className="p-1 rounded text-neutral-600 hover:text-neutral-900 hover:bg-[#f0ede6] transition-colors cursor-pointer" title="Reset zoom and position">
             <RotateCcw size={15} />
           </button>
-          <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', padding: '0 6px', borderLeft: '1px solid var(--border-subtle)' }}>
+          <span style={{ fontSize: '0.6875rem', color: '#71717a', padding: '0 6px', borderLeft: '1px solid #ecebe7', fontWeight: 600 }}>
             {Math.round(zoom * 100)}%
           </span>
         </div>
@@ -247,7 +247,7 @@ export const ConceptGraphCanvas = ({
             markerHeight="6"
             orient="auto-start-reverse"
           >
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#6366f1" opacity="0.8" />
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#a1a1aa" />
           </marker>
           <marker
             id="dag-arrow-active"
@@ -258,12 +258,12 @@ export const ConceptGraphCanvas = ({
             markerHeight="7"
             orient="auto-start-reverse"
           >
-            <path d="M 0 1 L 10 5 L 0 9 z" fill="#818cf8" />
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#7c3aed" />
           </marker>
 
           {/* Grid pattern */}
           <pattern id="canvas-grid" width="30" height="30" patternUnits="userSpaceOnUse">
-            <circle cx="2" cy="2" r="1" fill="rgba(148, 163, 184, 0.07)" />
+            <circle cx="2" cy="2" r="1" fill="#dedcd5" />
           </pattern>
         </defs>
 
@@ -298,7 +298,7 @@ export const ConceptGraphCanvas = ({
                 <path
                   d={pathData}
                   fill="none"
-                  stroke={isRelatedToSelected ? '#818cf8' : 'rgba(99, 102, 241, 0.35)'}
+                  stroke={isRelatedToSelected ? '#7c3aed' : '#cbd5e1'}
                   strokeWidth={isRelatedToSelected ? 2.5 : 1.75}
                   strokeDasharray={isRelatedToSelected ? 'none' : '4 3'}
                   markerEnd={isRelatedToSelected ? 'url(#dag-arrow-active)' : 'url(#dag-arrow)'}
@@ -326,8 +326,8 @@ export const ConceptGraphCanvas = ({
                 : status === 'weak'
                 ? '#f59e0b'
                 : status === 'locked'
-                ? '#64748b'
-                : '#6366f1';
+                ? '#94a3b8'
+                : '#7c3aed';
 
             return (
               <g
@@ -347,13 +347,13 @@ export const ConceptGraphCanvas = ({
                 <rect
                   width={pos.width}
                   height={pos.height}
-                  rx="8"
-                  ry="8"
-                  fill={isSelected ? '#18243c' : '#101827'}
-                  stroke={isSelected ? '#818cf8' : isRelatedNode(node, selectedConceptId, edges) ? '#6366f1' : 'rgba(148, 163, 184, 0.15)'}
+                  rx="10"
+                  ry="10"
+                  fill={isSelected ? '#faf5ff' : '#ffffff'}
+                  stroke={isSelected ? '#7c3aed' : isRelatedNode(node, selectedConceptId, edges) ? '#a855f7' : '#e5e3dc'}
                   strokeWidth={isSelected ? 2 : 1}
                   style={{
-                    filter: isSelected ? 'drop-shadow(0 4px 12px rgba(99, 102, 241, 0.4))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                    filter: isSelected ? 'drop-shadow(0 4px 12px rgba(124, 58, 237, 0.25))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.04))'
                   }}
                 />
 
@@ -371,10 +371,10 @@ export const ConceptGraphCanvas = ({
                 {/* Difficulty & Status Icons */}
                 <foreignObject x="12" y="8" width={pos.width - 20} height="20">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className={`badge badge-${difficulty}`} style={{ fontSize: '0.625rem', padding: '1px 5px' }}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#faf9f5] border border-[#ecebe7] text-neutral-600">
                       {difficulty}
                     </span>
-                    <span style={{ fontSize: '0.625rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    <span style={{ fontSize: '0.625rem', color: '#71717a', display: 'flex', alignItems: 'center', gap: '3px' }}>
                       <Clock size={10} /> {node.estimated_minutes}m
                     </span>
                   </div>
@@ -384,9 +384,9 @@ export const ConceptGraphCanvas = ({
                 <text
                   x="14"
                   y="46"
-                  fill="#ffffff"
+                  fill="#18181b"
                   fontSize="12"
-                  fontWeight="600"
+                  fontWeight="700"
                   fontFamily="Inter, sans-serif"
                 >
                   {truncateText(node.title, 24)}
@@ -395,10 +395,10 @@ export const ConceptGraphCanvas = ({
                 {/* Prerequisite Count indicator */}
                 <foreignObject x="12" y="56" width={pos.width - 24} height="22">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>
+                    <span style={{ color: '#71717a' }}>
                       Tier {node.tier_level}
                     </span>
-                    <span style={{ color: statusColor, fontWeight: 600, textTransform: 'capitalize' }}>
+                    <span style={{ color: statusColor, fontWeight: 700, textTransform: 'capitalize' }}>
                       {status === 'mastered' ? 'Mastered ✓' : status === 'weak' ? 'Needs Review !' : status}
                     </span>
                   </div>
@@ -415,34 +415,35 @@ export const ConceptGraphCanvas = ({
           position: 'absolute',
           bottom: '16px',
           right: '16px',
-          background: 'rgba(11, 17, 30, 0.92)',
+          background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(8px)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-sm)',
-          padding: '8px 12px',
+          border: '1px solid #e5e3dc',
+          borderRadius: '12px',
+          padding: '8px 14px',
           display: 'flex',
-          gap: '12px',
+          gap: '14px',
           alignItems: 'center',
           fontSize: '0.6875rem',
-          color: 'var(--text-secondary)',
+          color: '#374151',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
           pointerEvents: 'none'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
-          <span>Mastered</span>
+          <span style={{ fontWeight: 600 }}>Mastered</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#06b6d4' }} />
-          <span>In Progress</span>
+          <span style={{ fontWeight: 600 }}>In Progress</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
-          <span>Weak (Needs Review)</span>
+          <span style={{ fontWeight: 600 }}>Weak</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#64748b' }} />
-          <span>Locked</span>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#94a3b8' }} />
+          <span style={{ fontWeight: 600 }}>Locked</span>
         </div>
       </div>
     </div>

@@ -51,6 +51,18 @@ class Settings(BaseSettings):
         description="Prebuilt voice name: Puck, Charon, Kore, Fenrir, Aoede"
     )
 
+    # Groq Cloud API for Chat Bot Dashboard
+    groq_api_key: Optional[str] = Field(
+        default=None,
+        validation_alias="GROQ_API_KEY",
+        description="Groq API key for Chat Bot Dashboard"
+    )
+    groq_model: str = Field(
+        default="qwen/qwen3.8-27b",
+        validation_alias="GROQ_MODEL",
+        description="Default Groq chat model"
+    )
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

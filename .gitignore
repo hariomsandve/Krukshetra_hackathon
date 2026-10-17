@@ -24,3 +24,6 @@ Thumbs.db
 # Firebase Credentials
 *serviceAccountKey*.json
 
+# Backups
+src_backup/
+

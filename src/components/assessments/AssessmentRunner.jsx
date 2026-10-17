@@ -95,67 +95,62 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
     const allAnswered = Object.keys(selectedAnswers).length === questions.length;
 
     return (
-      <div style={{ padding: '24px', maxWidth: '820px', margin: '0 auto', color: '#fff' }}>
+      <div className="p-4 sm:p-6 max-w-4xl mx-auto text-neutral-900 select-none">
         {/* Quiz Nav Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className="flex justify-between items-center mb-5">
           <div>
             <button
               onClick={() => setActiveQuiz(null)}
-              className="btn btn-secondary"
-              style={{ fontSize: '0.75rem', padding: '4px 10px', marginBottom: '8px' }}
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#dedcd5] hover:bg-[#edebe5] text-neutral-700 bg-white shadow-2xs mb-2 flex items-center gap-1.5 cursor-pointer transition-colors"
             >
-              ← Back to Assessments
+              <ArrowLeft size={13} />
+              <span>Back to Assessments</span>
             </button>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff' }}>{activeQuiz.title}</h2>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">{activeQuiz.title}</h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: 'var(--radius-full)', background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.25)', fontSize: '0.75rem', color: '#c4b5fd', fontWeight: 600 }}>
-            <Clock size={14} color="#a855f7" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-xs font-bold text-purple-900 shadow-2xs">
+            <Clock size={14} className="text-purple-700" />
             <span>Time Left: 14:20</span>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div style={{ display: 'flex', gap: '6px', marginBottom: '24px' }}>
+        <div className="flex gap-1.5 mb-6">
           {questions.map((_, idx) => (
             <div
               key={idx}
               onClick={() => setCurrentQuestionIdx(idx)}
-              style={{
-                flex: 1,
-                height: '5px',
-                borderRadius: '4px',
-                background: selectedAnswers[idx] !== undefined
-                  ? '#a855f7'
+              className={`flex-1 h-1.5 rounded-full cursor-pointer transition-all ${
+                selectedAnswers[idx] !== undefined
+                  ? 'bg-neutral-900'
                   : idx === currentQuestionIdx
-                  ? 'rgba(168, 85, 247, 0.4)'
-                  : 'rgba(255, 255, 255, 0.08)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
-              }}
+                  ? 'bg-purple-600'
+                  : 'bg-[#dedcd5]'
+              }`}
             />
           ))}
         </div>
 
         {/* Question Card */}
-        <div className="surface-card" style={{ padding: '28px', marginBottom: '24px', background: 'rgba(16, 22, 38, 0.85)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#c4b5fd', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div className="bg-white border border-[#e5e3dc] rounded-2xl p-6 sm:p-8 shadow-xs mb-6 space-y-5">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-bold uppercase tracking-wider text-purple-800 bg-purple-50 px-2.5 py-0.5 rounded-md border border-purple-200">
               Question {currentQuestionIdx + 1} of {questions.length} • Difficulty: {q.difficulty}
             </span>
             {q.tags && (
-              <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#94a3b8' }}>
+              <span className="text-xs font-medium text-neutral-500 bg-[#faf9f5] border border-[#ecebe7] px-2 py-0.5 rounded-md">
                 {q.tags.join(', ')}
               </span>
             )}
           </div>
 
-          <h3 style={{ fontSize: '1.15rem', color: '#fff', marginBottom: '24px', lineHeight: 1.5, fontWeight: 700 }}>
+          <h3 className="text-base sm:text-lg font-bold text-neutral-900 leading-relaxed">
             {q.question}
           </h3>
 
           {/* Options */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="flex flex-col gap-2.5">
             {q.options.map((opt) => {
               const isSelected = selectedAnswers[currentQuestionIdx] === opt.id;
               const isCorrect = isSubmitted && opt.id === q.correctOptionId;
@@ -165,54 +160,30 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
                 <div
                   key={opt.id}
                   onClick={() => handleSelectOption(opt.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px',
-                    padding: '14px 18px',
-                    borderRadius: 'var(--radius-md)',
-                    background: isCorrect
-                      ? 'rgba(16, 185, 129, 0.15)'
+                  className={`flex items-center gap-3.5 p-3.5 px-4 rounded-xl border text-xs sm:text-sm transition-all cursor-pointer ${
+                    isCorrect
+                      ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold'
                       : isWrong
-                      ? 'rgba(244, 63, 94, 0.15)'
+                      ? 'bg-rose-50 border-rose-400 text-rose-950 font-bold'
                       : isSelected
-                      ? 'rgba(168, 85, 247, 0.18)'
-                      : 'rgba(255, 255, 255, 0.02)',
-                    border: isCorrect
-                      ? '1px solid #10b981'
-                      : isWrong
-                      ? '1px solid #f43f5e'
-                      : isSelected
-                      ? '1px solid #a855f7'
-                      : '1px solid var(--border-subtle)',
-                    cursor: isSubmitted ? 'default' : 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
+                      ? 'bg-purple-50 border-purple-400 text-purple-950 font-bold shadow-2xs'
+                      : 'bg-[#faf9f5] border-[#dedcd5] text-neutral-800 hover:bg-white hover:border-neutral-900'
+                  }`}
                 >
                   <span
-                    style={{
-                      width: '26px',
-                      height: '26px',
-                      borderRadius: '50%',
-                      background: isCorrect
-                        ? '#10b981'
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isCorrect
+                        ? 'bg-emerald-600 text-white'
                         : isWrong
-                        ? '#f43f5e'
+                        ? 'bg-rose-600 text-white'
                         : isSelected
-                        ? '#a855f7'
-                        : 'rgba(255, 255, 255, 0.06)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      color: '#fff',
-                      flexShrink: 0
-                    }}
+                        ? 'bg-purple-700 text-white'
+                        : 'bg-white border border-[#dedcd5] text-neutral-700'
+                    }`}
                   >
                     {opt.id.toUpperCase()}
                   </span>
-                  <span style={{ fontSize: '0.875rem', color: '#f1f5f9' }}>{opt.text}</span>
+                  <span className="leading-normal">{opt.text}</span>
                 </div>
               );
             })}
@@ -220,30 +191,20 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
 
           {/* Explanation if submitted */}
           {isSubmitted && q.explanation && (
-            <div
-              style={{
-                marginTop: '20px',
-                padding: '14px 16px',
-                borderRadius: 'var(--radius-sm)',
-                background: 'rgba(139, 92, 246, 0.1)',
-                border: '1px solid rgba(139, 92, 246, 0.25)',
-                fontSize: '0.8125rem',
-                color: '#cbd5e1',
-                lineHeight: 1.5
-              }}
-            >
-              <strong style={{ color: '#c4b5fd' }}>Mentos Explanation:</strong> {q.explanation}
+            <div className="p-4 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-950 leading-relaxed">
+              <strong className="text-purple-900 font-bold">MentOS AI Pedagogical Explanation:</strong> {q.explanation}
             </div>
           )}
         </div>
 
         {/* Footer Navigation */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="flex justify-between items-center">
           <button
             onClick={() => setCurrentQuestionIdx(prev => Math.max(0, prev - 1))}
             disabled={currentQuestionIdx === 0}
-            className="btn btn-secondary"
-            style={{ opacity: currentQuestionIdx === 0 ? 0.5 : 1 }}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold border border-[#dedcd5] bg-white text-neutral-700 shadow-2xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+              currentQuestionIdx === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#edebe5]'
+            }`}
           >
             <ArrowLeft size={14} /> Previous
           </button>
@@ -252,7 +213,7 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
             currentQuestionIdx < questions.length - 1 ? (
               <button
                 onClick={() => setCurrentQuestionIdx(prev => prev + 1)}
-                className="btn btn-primary"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-neutral-900 hover:bg-black text-white shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 Next <ArrowRight size={14} />
               </button>
@@ -260,8 +221,7 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
               <button
                 onClick={handleSubmit}
                 disabled={!allAnswered}
-                className="btn btn-primary"
-                style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors"
               >
                 Submit Assessment ({Object.keys(selectedAnswers).length}/{questions.length})
               </button>
@@ -269,7 +229,7 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
           ) : (
             <button
               onClick={() => handleStartQuiz(activeQuiz)}
-              className="btn btn-secondary"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-[#dedcd5] hover:bg-[#edebe5] text-neutral-800 shadow-2xs flex items-center gap-1.5 cursor-pointer transition-colors"
             >
               <RotateCcw size={14} /> Retake Assessment
             </button>
@@ -279,32 +239,27 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
         {/* Score Modal if Submitted */}
         {scoreResult && (
           <div
-            className="surface-card animate-fade-in"
-            style={{
-              marginTop: '24px',
-              padding: '24px',
-              textAlign: 'center',
-              border: scoreResult.percentage >= 70 ? '1px solid #10b981' : '1px solid #f59e0b',
-              background: 'rgba(16, 22, 38, 0.95)'
-            }}
+            className={`mt-6 p-6 rounded-2xl bg-white border text-center shadow-sm space-y-3 ${
+              scoreResult.percentage >= 70 ? 'border-emerald-300' : 'border-amber-300'
+            }`}
           >
-            <Award size={36} color={scoreResult.percentage >= 70 ? '#10b981' : '#f59e0b'} style={{ margin: '0 auto 10px' }} />
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>
+            <Award size={36} className={`mx-auto ${scoreResult.percentage >= 70 ? 'text-emerald-600' : 'text-amber-600'}`} />
+            <h3 className="text-xl font-extrabold text-neutral-900">
               Assessment Complete: {scoreResult.percentage}% Score
             </h3>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto">
               You answered {scoreResult.correct} of {scoreResult.total} questions correctly. Your mastery telemetry has been updated!
             </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            <div className="flex justify-center gap-3 pt-2">
               <button
                 onClick={() => onNavigate('dashboard')}
-                className="btn btn-primary"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-neutral-900 hover:bg-black text-white shadow-2xs cursor-pointer transition-colors"
               >
                 View Updated Dashboard
               </button>
               <button
                 onClick={() => setActiveQuiz(null)}
-                className="btn btn-secondary"
+                className="px-4 py-2 rounded-xl text-xs font-semibold border border-[#dedcd5] hover:bg-[#edebe5] bg-white text-neutral-800 shadow-2xs cursor-pointer transition-colors"
               >
                 Take Another Quiz
               </button>
@@ -317,58 +272,50 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
 
   // Quizzes Catalogue List View
   return (
-    <div style={{ padding: '28px 32px', maxWidth: '1200px', margin: '0 auto', color: '#fff' }}>
-      <div style={{ marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>
+    <div className="p-4 sm:p-8 max-w-6xl mx-auto text-neutral-900 select-none">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight mb-1">
           Practice & Diagnostic Assessments
         </h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-          Benchmark your algorithmic mastery and reinforce weak knowledge spots identified by the Mentos engine.
+        <p className="text-xs sm:text-sm text-neutral-600">
+          Benchmark your algorithmic mastery and reinforce weak knowledge spots identified by the MentOS cognitive engine.
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {availableQuizzes.map((quiz) => (
           <div
             key={quiz.id}
-            className="surface-card surface-card-interactive"
             onClick={() => handleStartQuiz(quiz)}
-            style={{
-              padding: '22px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              background: 'rgba(16, 22, 38, 0.75)',
-              borderRadius: 'var(--radius-lg)'
-            }}
+            className="bg-white border border-[#e5e3dc] rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-neutral-900 hover:shadow-sm transition-all cursor-pointer group"
           >
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span className="badge" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c4b5fd' }}>
-                  {quiz.difficulty.toUpperCase()}
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-purple-50 text-purple-900 border border-purple-200 px-2 py-0.5 rounded-md">
+                  {quiz.difficulty}
                 </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Clock size={13} /> {quiz.timeLimitMinutes} mins
+                <span className="text-xs text-neutral-500 font-medium flex items-center gap-1">
+                  <Clock size={12} /> {quiz.timeLimitMinutes} mins
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fff', marginBottom: '8px' }}>
+              <h3 className="text-base font-bold text-neutral-900 mb-2 group-hover:text-purple-800 transition-colors">
                 {quiz.title}
               </h3>
-              <p style={{ fontSize: '0.78125rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '16px' }}>
+              <p className="text-xs text-neutral-600 leading-relaxed mb-4">
                 {quiz.description}
               </p>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', borderTop: '1px solid var(--border-subtle)' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <div className="flex justify-between items-center pt-3 border-t border-[#ecebe7]">
+              <span className="text-[11px] text-neutral-500 font-medium">
                 {quiz.questionsCount} Multiple Choice Questions
               </span>
               <button
-                className="btn btn-primary"
-                style={{ fontSize: '0.75rem', padding: '6px 14px' }}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-neutral-900 hover:bg-black text-white shadow-2xs flex items-center gap-1 cursor-pointer transition-colors"
               >
-                Start Quiz <ArrowRight size={13} />
+                <span>Start</span>
+                <ArrowRight size={12} />
               </button>
             </div>
           </div>
@@ -376,47 +323,38 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
       </div>
 
       {/* Past Assessment History */}
-      <div style={{ marginTop: '36px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+      <div className="mt-10">
+        <div className="flex justify-between items-center mb-4">
           <div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', marginBottom: '4px' }}>
+            <h3 className="text-lg font-bold text-neutral-900 mb-0.5">
               Past Assessment Submissions & Diagnostic Scores
             </h3>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-              Historical attempts recorded by the Mentos cognitive engine:
+            <p className="text-xs text-neutral-500">
+              Historical attempts recorded by the MentOS cognitive engine:
             </p>
           </div>
-          <span className="badge" style={{ background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted)' }}>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-white border border-[#dedcd5] text-neutral-600">
             {mockData.assessmentHistory?.length || 0} Submissions
           </span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {mockData.assessmentHistory?.map((attempt) => {
             const isHigh = attempt.scorePercent >= 75;
             const isMed = attempt.scorePercent >= 50 && attempt.scorePercent < 75;
-            const color = isHigh ? '#10b981' : isMed ? '#f59e0b' : '#ef4444';
-            const bg = isHigh ? 'rgba(16, 185, 129, 0.08)' : isMed ? 'rgba(245, 158, 11, 0.08)' : 'rgba(239, 68, 68, 0.08)';
-            const border = isHigh ? 'rgba(16, 185, 129, 0.25)' : isMed ? 'rgba(245, 158, 11, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+            const scoreColor = isHigh ? 'text-emerald-700' : isMed ? 'text-amber-700' : 'text-rose-700';
+            const badgeBg = isHigh ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : isMed ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-rose-50 text-rose-800 border-rose-200';
 
             return (
               <div
                 key={attempt.id}
-                style={{
-                  padding: '16px 20px',
-                  borderRadius: 'var(--radius-md)',
-                  background: bg,
-                  border: `1px solid ${border}`,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
+                className="bg-white border border-[#e5e3dc] rounded-2xl p-4 shadow-xs flex justify-between items-center"
               >
                 <div>
-                  <h4 style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#fff', marginBottom: '4px' }}>
+                  <h4 className="text-sm font-bold text-neutral-900 mb-1">
                     {attempt.title}
                   </h4>
-                  <div style={{ display: 'flex', gap: '8px', fontSize: '0.71875rem', color: 'var(--text-muted)' }}>
+                  <div className="flex gap-2 text-[11px] text-neutral-500">
                     <span>{new Date(attempt.submittedAt).toLocaleDateString()}</span>
                     <span>•</span>
                     <span>{attempt.correctCount}/{attempt.totalCount} correct</span>
@@ -425,11 +363,11 @@ export const AssessmentRunner = ({ onFinishAssessment, onNavigate }) => {
                   </div>
                 </div>
 
-                <div style={{ textAlign: 'right' }}>
-                  <span style={{ fontSize: '1.3rem', fontWeight: 800, color }}>
+                <div className="text-right">
+                  <span className={`text-xl font-extrabold ${scoreColor}`}>
                     {attempt.scorePercent}%
                   </span>
-                  <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                  <div className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border mt-0.5 ${badgeBg}`}>
                     {attempt.status}
                   </div>
                 </div>

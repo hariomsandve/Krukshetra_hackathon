@@ -1,174 +1,28 @@
-:root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Outfit', sans-serif;
+@import "tailwindcss";
 
-  /* Mentos AI Dark Purple-Glass Palette */
-  --bg-app: #090d16;
-  --bg-app-ambient: radial-gradient(ellipse 90% 60% at 50% -20%, rgba(139, 92, 246, 0.12), rgba(255, 255, 255, 0)),
-                    radial-gradient(circle at 10% 25%, rgba(168, 85, 247, 0.05), transparent 45%),
-                    radial-gradient(circle at 90% 75%, rgba(99, 102, 241, 0.05), transparent 45%),
-                    #090d16;
+@layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
 
-  --bg-sidebar: #0b0f19;
-  --bg-topbar: rgba(11, 15, 25, 0.88);
-  --bg-surface: #101626;
-  --bg-surface-elevated: #151d30;
-  --bg-surface-hover: #19233a;
-  
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.14);
-  --border-strong: rgba(139, 92, 246, 0.3);
-  --border-focus: rgba(168, 85, 247, 0.55);
-
-  --accent-purple: #a855f7;
-  --accent-primary: #8b5cf6;
-  --accent-primary-hover: #7c3aed;
-  --accent-secondary: #6366f1;
-  --accent-cyan: #06b6d4;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-disabled: #475569;
-
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-  --radius-full: 9999px;
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
+    color: #1a1a1a;
+    background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: var(--font-sans);
-  background-color: var(--bg-app);
-  background-image: var(--bg-app-ambient);
-  color: var(--text-primary);
-  min-height: 100vh;
-  line-height: 1.5;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Glass & Card Tokens */
-.surface-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.surface-card:hover {
-  border-color: var(--border-medium);
-  background: var(--bg-surface-hover);
-}
-
-.surface-card-interactive {
-  cursor: pointer;
-}
-
-.surface-card-interactive:hover {
-  border-color: var(--border-strong);
-  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5), 0 0 16px rgba(139, 92, 246, 0.15);
-  transform: translateY(-1px);
-}
-
-/* Button Tokens */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  padding: 7px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-  outline: none;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 12px rgba(139, 92, 246, 0.3);
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.45);
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-  border-color: var(--border-subtle);
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--border-medium);
-  color: #ffffff;
-}
-
-.btn-purple-subtle {
-  background: rgba(139, 92, 246, 0.12);
-  color: #c4b5fd;
-  border: 1px solid rgba(139, 92, 246, 0.25);
-}
-
-.btn-purple-subtle:hover {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.4);
-  color: #ede9fe;
-}
-
-/* Badge Tokens */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: 0.6875rem;
-  font-weight: 600;
-}
-
-.badge-beginner {
-  background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-
-.badge-intermediate {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-.badge-advanced {
-  background: rgba(244, 63, 94, 0.12);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.25);
-}
-
-/* Custom Scrollbars */
+/* Custom subtle scrollbar matching Claude desktop UI */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -176,36 +30,125 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.28);
 }
 
-/* Animations */
-@keyframes mentosOrbPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 35px rgba(139, 92, 246, 0.4), inset 0 0 25px rgba(168, 85, 247, 0.3);
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Dedicated Print Media Query for Clean Artifact Document Output */
+@media print {
+  @page {
+    margin: 1.6cm 1.4cm;
+    size: auto;
   }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 50px rgba(168, 85, 247, 0.6), inset 0 0 35px rgba(236, 72, 153, 0.35);
+
+  html, body, #root {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #111827 !important;
   }
-}
 
-@keyframes mentosSpinSlow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+  /* Hide all application window chrome, sidebars, conversation pane, dividers, modals and floating toolbars */
+  header,
+  aside,
+  .print-hidden,
+  .chat-pane,
+  .drag-divider,
+  .artifact-header,
+  .artifact-toolbar,
+  .modal-backdrop,
+  .toast-notification,
+  button:not(.print-allow) {
+    display: none !important;
+  }
 
-@keyframes mentosFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+  /* Display print-specific document header */
+  .print-header {
+    display: block !important;
+  }
 
-.animate-fade-in {
-  animation: mentosFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* Expand artifact container into clean standard document */
+  .artifact-panel {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .artifact-scroll-container {
+    overflow: visible !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .printable-document {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Clean print table formatting */
+  .printable-document table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 1.25rem 0 !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .printable-document table td,
+  .printable-document table th {
+    border: 1px solid #d1d5db !important;
+    padding: 8px 12px !important;
+    font-size: 10.5pt !important;
+    color: #111827 !important;
+  }
+
+  .printable-document h2 {
+    font-size: 18pt !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    margin-top: 1.5rem !important;
+  }
+
+  .printable-document p,
+  .printable-document li {
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+    color: #1f2937 !important;
+  }
+
+  .printable-document li {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 0.6rem !important;
+  }
+
+  /* Remove screen-only visual elements like the horizontal pill indicator */
+  .screen-only {
+    display: none !important;
+  }
 }
