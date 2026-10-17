@@ -105,7 +105,7 @@ async function callGroqChat(
           model,
           messages: groqMessages,
           temperature: 0.7,
-          max_tokens: 1500,
+          max_tokens: 800,
         }),
       });
 

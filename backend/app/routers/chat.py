@@ -94,7 +94,7 @@ async def call_groq_api(prompt: str, history: List[ChatMessage], context: Option
                         "model": model,
                         "messages": groq_messages,
                         "temperature": 0.7,
-                        "max_tokens": 1500,
+                        "max_tokens": 800,
                     }
                 )
 
